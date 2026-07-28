@@ -1,0 +1,8 @@
+build/
+tools/
+deploy/
+CMakeLists.txt.user
+.vscode/
+.idea/
+.cursor/
+.cursor/
