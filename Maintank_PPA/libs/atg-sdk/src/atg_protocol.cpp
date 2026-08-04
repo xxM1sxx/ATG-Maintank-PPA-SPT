@@ -124,11 +124,8 @@ bool AtgProtocol::read_input_registers(uint16_t start, uint16_t count,
         atg_debug_hex("modbus RX", resp, rx_len);
 
     if (resp[1] & 0x80) {
-        if (atg_debug_enabled()) {
-            std::fprintf(stderr,
-                "atg-debug: modbus exception fc=%02X code=%02X (%s)\n",
-                resp[1], resp[2], modbus_exception_text(resp[2]));
-        }
+        atg_debug_log("atg-debug", "modbus exception fc=%02X code=%02X (%s)",
+            resp[1], resp[2], modbus_exception_text(resp[2]));
         return false;
     }
 
@@ -136,8 +133,8 @@ bool AtgProtocol::read_input_registers(uint16_t start, uint16_t count,
     if (byte_count == 0 || 3 + byte_count > sizeof(resp))
         return false;
 
-    if (atg_debug_enabled() && byte_count < 32)
-        std::fprintf(stderr, "atg-debug: warning: expected 32 data bytes, got %zu\n", byte_count);
+    if (byte_count < 32)
+        atg_debug_log("atg-debug", "warning: expected 32 data bytes, got %zu", byte_count);
 
     const size_t copy = (byte_count < dst_cap) ? byte_count : dst_cap;
     std::memcpy(dst, resp + 3, copy);
@@ -158,13 +155,12 @@ TankReading AtgProtocol::parse_sp400_payload(const uint8_t* data, size_t len) co
     if (len >= 28) r.temp_d_c = parse_float4(data + 24);
     if (len >= 32) r.temp_e_c = parse_float4(data + 28);
 
-    if (atg_debug_enabled()) {
-        std::fprintf(stderr,
-            "atg-debug: parsed fuel=%.1f water=%.1f temp=%.1f (format=%s, len=%zu)\n",
-            r.fuel_level_mm, r.water_level_mm, r.fuel_temp_c,
-            float_format() == FloatFormat::ModbusLe ? "modbus_le" : "holykell",
-            len);
-    }
+    atg_debug_log("atg-debug",
+        "parsed fuel=%.1fmm water=%.1fmm temp=%.1fC (a=%.1f b=%.1f c=%.1f d=%.1f e=%.1f) format=%s len=%zu",
+        r.fuel_level_mm, r.water_level_mm, r.fuel_temp_c,
+        r.temp_a_c, r.temp_b_c, r.temp_c_c, r.temp_d_c, r.temp_e_c,
+        float_format() == FloatFormat::ModbusLe ? "modbus_le" : "holykell",
+        len);
 
     return r;
 }

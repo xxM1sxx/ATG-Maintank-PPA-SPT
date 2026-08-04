@@ -19,14 +19,18 @@ void on_signal(int) {
 void print_startup_banner(const char* db_path,
                           const std::vector<atg::SensorConfig>& configs) {
     const bool debug = atg::atg_debug_enabled();
-    std::cerr << "atg-reader: db=" << db_path
+    std::cerr << "==================== atg-reader starting ====================\n"
+              << "atg-reader: db=" << db_path
               << " sensors=" << configs.size()
-              << " debug=" << (debug ? "on" : "silent") << "\n";
+              << " debug=" << (debug ? "on" : "silent (ATG_DEBUG=0)") << "\n";
     for (const auto& cfg : configs) {
         std::cerr << "atg-reader: sensor[" << cfg.id << "] device=" << cfg.device
                   << " slave=" << static_cast<unsigned>(cfg.slave_id)
+                  << " de_pin=" << cfg.de_gpio_pin
+                  << " timeout=" << cfg.timeout.count() << "ms"
                   << " interval=" << cfg.polling_interval.count() << "ms\n";
     }
+    std::cerr << "===============================================================\n";
 }
 
 } // namespace

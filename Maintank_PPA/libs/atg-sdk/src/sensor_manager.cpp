@@ -72,6 +72,13 @@ void SensorManager::worker(SensorConfig cfg) {
             atg.set_response_timeout(cfg.timeout);
             if (de_pin) atg.set_de_pin(de_pin.get());
 
+            atg_debug_log("atg-reader",
+                "sensor=%d device=%s slave=%u connected (de_pin=%d timeout=%lldms interval=%lldms)",
+                cfg.id, cfg.device.c_str(), static_cast<unsigned>(cfg.slave_id),
+                cfg.de_gpio_pin,
+                static_cast<long long>(cfg.timeout.count()),
+                static_cast<long long>(cfg.polling_interval.count()));
+
             while (running_) {
                 SensorResult result;
                 result.id = cfg.id;
@@ -97,19 +104,17 @@ void SensorManager::worker(SensorConfig cfg) {
 
                 if (callback_) callback_(cfg.id, result);
 
-                if (atg_debug_enabled()) {
-                    if (result.ok && !result.readings.empty()) {
-                        const auto& t = result.readings.front();
-                        std::fprintf(stderr,
-                            "atg-reader: sensor=%d device=%s slave=%u ok=1 fuel=%.1f water=%.1f temp=%.1f\n",
-                            cfg.id, cfg.device.c_str(), static_cast<unsigned>(cfg.slave_id),
-                            t.fuel_level_mm, t.water_level_mm, t.fuel_temp_c);
-                    } else {
-                        std::fprintf(stderr,
-                            "atg-reader: sensor=%d device=%s slave=%u ok=0 error=%s\n",
-                            cfg.id, cfg.device.c_str(), static_cast<unsigned>(cfg.slave_id),
-                            result.error.c_str());
-                    }
+                if (result.ok && !result.readings.empty()) {
+                    const auto& t = result.readings.front();
+                    atg_debug_log("atg-reader",
+                        "sensor=%d device=%s slave=%u ok=1 fuel=%.1fmm water=%.1fmm temp=%.1fC",
+                        cfg.id, cfg.device.c_str(), static_cast<unsigned>(cfg.slave_id),
+                        t.fuel_level_mm, t.water_level_mm, t.fuel_temp_c);
+                } else {
+                    atg_debug_log("atg-reader",
+                        "sensor=%d device=%s slave=%u ok=0 error=%s",
+                        cfg.id, cfg.device.c_str(), static_cast<unsigned>(cfg.slave_id),
+                        result.error.c_str());
                 }
 
                 const auto step = std::chrono::milliseconds(100);
@@ -133,11 +138,8 @@ void SensorManager::worker(SensorConfig cfg) {
             }
             if (callback_) callback_(cfg.id, result);
 
-            if (atg_debug_enabled()) {
-                std::fprintf(stderr,
-                    "atg-reader: sensor=%d device=%s open failed: %s (retry 5s)\n",
-                    cfg.id, cfg.device.c_str(), ex.what());
-            }
+            atg_debug_log("atg-reader", "sensor=%d device=%s open failed: %s (retry 5s)",
+                cfg.id, cfg.device.c_str(), ex.what());
 
             for (int i = 0; i < 50 && running_; ++i)
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));

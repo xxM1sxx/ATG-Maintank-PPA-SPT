@@ -1,4 +1,5 @@
 #include "atg_db.hpp"
+#include <atg/debug_log.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <chrono>
@@ -134,13 +135,10 @@ void AtgDatabase::upsert_reading(int sensor_id, const atg::SensorResult& r) {
             volume = vol;
             volume_valid = true;
         }
-        const char* dbg = std::getenv("ATG_DEBUG");
-        if (!(dbg && dbg[0] == '0' && dbg[1] == '\0')) {
-            std::fprintf(stderr,
-                "atg-debug: volume lookup sensor=%d probe=%.1f offset=%.1f sounding=%.1f points=%zu -> %.1f L\n",
-                sensor_id, probe_mm, offset_mm, probe_mm + offset_mm, points.size(),
-                volume_valid ? volume : -1.0);
-        }
+        atg::atg_debug_log("atg-debug",
+            "volume lookup sensor=%d probe=%.1fmm offset=%.1fmm sounding=%.1fmm points=%zu -> %.1f L",
+            sensor_id, probe_mm, offset_mm, probe_mm + offset_mm, points.size(),
+            volume_valid ? volume : -1.0);
     }
 
     sqlite3_bind_int(stmt, 1, sensor_id);
