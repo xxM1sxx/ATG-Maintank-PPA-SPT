@@ -6,8 +6,8 @@
 
 function import_calibration_csv($conn, $sensor_id, $csv_path) {
     $sensor_id = intval($sensor_id);
-    if ($sensor_id < 1 || $sensor_id > 6) {
-        throw new InvalidArgumentException('sensor_id must be 1..6');
+    if ($sensor_id < 1 || $sensor_id > 8) {
+        throw new InvalidArgumentException('sensor_id must be 1..8');
     }
     if (!is_readable($csv_path)) {
         throw new RuntimeException('Cannot read CSV: ' . $csv_path);
@@ -73,7 +73,7 @@ function calibration_seed_path($sensor_id) {
 
 if (php_sapi_name() === 'cli') {
     if ($argc < 3) {
-        fwrite(STDERR, "Usage: php import_calibration.php <sensor_id 1-6> <csv_path>\n");
+        fwrite(STDERR, "Usage: php import_calibration.php <sensor_id 1-8> <csv_path>\n");
         exit(1);
     }
     require_once __DIR__ . '/conn.php';

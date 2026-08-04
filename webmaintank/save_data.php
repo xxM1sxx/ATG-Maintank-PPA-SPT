@@ -330,7 +330,7 @@ if (isset($_POST['set_date_time'])) {
 
 if (isset($_POST['save_atg_sensors'])) {
 	try {
-		for ($i = 1; $i <= 6; $i++) {
+		for ($i = 1; $i <= 8; $i++) {
 			$enabled = isset($_POST["atg_enabled_$i"]) ? 1 : 0;
 			$label = isset($_POST["atg_label_$i"]) ? $_POST["atg_label_$i"] : "Sensor $i";
 			$device = isset($_POST["atg_device_$i"]) ? $_POST["atg_device_$i"] : '';
@@ -381,7 +381,7 @@ if (isset($_POST['save_calibration_table'])) {
 	try {
 		require_once 'import_calibration.php';
 		$sensor_id = intval(isset($_POST['calibration_sensor_id']) ? $_POST['calibration_sensor_id'] : 0);
-		if ($sensor_id < 1 || $sensor_id > 6) {
+		if ($sensor_id < 1 || $sensor_id > 8) {
 			throw new InvalidArgumentException('Invalid sensor');
 		}
 		$soundings = isset($_POST['sounding_mm']) ? $_POST['sounding_mm'] : array();
@@ -417,7 +417,7 @@ if (isset($_POST['import_calibration_csv'])) {
 	try {
 		require_once 'import_calibration.php';
 		$sensor_id = intval(isset($_POST['calibration_sensor_id']) ? $_POST['calibration_sensor_id'] : 0);
-		if ($sensor_id < 1 || $sensor_id > 6) {
+		if ($sensor_id < 1 || $sensor_id > 8) {
 			throw new InvalidArgumentException('Invalid sensor');
 		}
 		if (!isset($_FILES['calibration_csv']) || $_FILES['calibration_csv']['error'] !== UPLOAD_ERR_OK) {
@@ -439,7 +439,7 @@ if (isset($_POST['import_calibration_seed'])) {
 	try {
 		require_once 'import_calibration.php';
 		$sensor_id = intval(isset($_POST['calibration_sensor_id']) ? $_POST['calibration_sensor_id'] : 0);
-		if ($sensor_id < 1 || $sensor_id > 6) {
+		if ($sensor_id < 1 || $sensor_id > 8) {
 			throw new InvalidArgumentException('Invalid sensor');
 		}
 		$seed = calibration_seed_path($sensor_id);

@@ -21,14 +21,11 @@ void print_startup_banner(const char* db_path,
     const bool debug = atg::atg_debug_enabled();
     std::cerr << "atg-reader: db=" << db_path
               << " sensors=" << configs.size()
-              << " debug=" << (debug ? "on" : "off") << "\n";
+              << " debug=" << (debug ? "on" : "silent") << "\n";
     for (const auto& cfg : configs) {
         std::cerr << "atg-reader: sensor[" << cfg.id << "] device=" << cfg.device
                   << " slave=" << static_cast<unsigned>(cfg.slave_id)
                   << " interval=" << cfg.polling_interval.count() << "ms\n";
-    }
-    if (!debug) {
-        std::cerr << "atg-reader: hint: set ATG_DEBUG=1 for Modbus hex logs\n";
     }
 }
 

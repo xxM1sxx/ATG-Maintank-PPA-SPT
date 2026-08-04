@@ -57,7 +57,7 @@ Without this, Save may silently truncate rows. CSV import/export always works fo
 
 ## 5. Debug Modbus / atg-reader logs
 
-Debug is enabled by default in [`deploy/atg-reader.service`](deploy/atg-reader.service) via `ATG_DEBUG=1`. Logs go to systemd journal (not an interactive terminal).
+Debug is enabled by default — Modbus TX/RX hex, parsed values, and volume lookup always print to stderr. Set `ATG_DEBUG=0` in the service file to silence. Logs go to systemd journal (not an interactive terminal).
 
 ```bash
 sudo cp deploy/atg-reader.service /etc/systemd/system/
@@ -73,7 +73,7 @@ You should see lines like:
 - `atg-debug: parsed fuel=963.0 water=120.0 temp=0.0`
 - `atg-reader: sensor=1 device=/dev/ttyUSB0 slave=1 ok=1 fuel=...`
 
-To disable debug: remove `Environment=ATG_DEBUG=1` from the service file, or set `ATG_DEBUG=0`.
+To silence debug: add `Environment=ATG_DEBUG=0` to the service file.
 
 ### Foreground test (no systemd)
 
@@ -83,19 +83,19 @@ Stop the service first so `/dev/ttyUSB0` is free:
 sudo systemctl stop atg-reader
 ```
 
-Running `./atg-reader` alone does **not** enable Modbus hex logs — `ATG_DEBUG` is only set in the systemd unit. You must export it for manual runs:
+Running `./atg-reader` prints all Modbus hex logs by default. No extra flags needed:
 
 ```bash
-cd ~/Projects/Maintak_PPA/build
-ATG_DEBUG=1 ATG_RTS_DE=1 ATG_RS485_DELAY_MS=15 ./atg-reader /home/user/Apps/qims_logger.db
+cd ~/Projects/Maintank_PPA/build
+ATG_RTS_DE=1 ATG_RS485_DELAY_MS=15 ./atg-reader /home/user/Apps/qims_logger.db
 ```
 
-Startup always prints a banner (db path, sensor list). Modbus TX/RX hex appears only when `ATG_DEBUG=1`.
+To silence: `ATG_DEBUG=0 ./atg-reader ...`
 
 Installed binary (same flags):
 
 ```bash
-ATG_DEBUG=1 /home/user/Apps/bin/atg-reader /home/user/Apps/qims_logger.db
+ATG_RTS_DE=1 /home/user/Apps/bin/atg-reader /home/user/Apps/qims_logger.db
 ```
 
 ### Python simulator (Windows laptop)
@@ -126,7 +126,7 @@ python tools/sp400_modbus_sim.py --port COM15 --no-random --fuel 963 --water 120
 
 1. Tutup Modbus Slave (satu program per COM port)
 2. Laptop: jalankan sim di atas
-3. BBB: `sudo systemctl stop atg-reader` lalu `ATG_DEBUG=1 ./atg-reader /home/user/Apps/qims_logger.db`
+3. BBB: `sudo systemctl stop atg-reader` lalu `ATG_RTS_DE=1 ./atg-reader /home/user/Apps/qims_logger.db`
 4. Expected RX: `01 04 20 ...` (32 data bytes), bukan `01 84 02`
 
 Port laptop (COM15) harus paired dengan `/dev/ttyUSB0` di BBB.
@@ -138,7 +138,7 @@ Jika BBB log `Modbus read failed` tapi sim menerima request: **rebuild firmware*
 python tools/sp400_modbus_sim.py --port COM15 --verbose --reply-delay-ms 30
 
 # BBB — rebuild dulu setelah sync
-cd ~/Projects/Maintak_PPA/build && cmake --build . && ATG_DEBUG=1 ./atg-reader /home/user/Apps/qims_logger.db
+cd ~/Projects/Maintak_PPA/build && cmake --build . && ATG_RTS_DE=1 ./atg-reader /home/user/Apps/qims_logger.db
 ```
 
 ### Modbus Slave simulation checklist (alternatif)
@@ -191,7 +191,7 @@ Foreground test:
 
 ```bash
 sudo systemctl stop atg-reader
-ATG_DEBUG=1 ATG_RTS_DE=1 ATG_RS485_DELAY_MS=15 \
+ATG_RTS_DE=1 ATG_RS485_DELAY_MS=15 \
   ./atg-reader /home/user/Apps/qims_logger.db
 ```
 

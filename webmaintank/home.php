@@ -514,7 +514,7 @@
                                         <th>Temp (°C)</th>
                                         <th>Last Update</th>
                                     </tr>
-                                    <?php for ($i = 1; $i <= 6; $i++): ?>
+                                    <?php for ($i = 1; $i <= 8; $i++): ?>
                                     <tr id="atg_row_<?php echo $i; ?>">
                                         <td><?php echo $i; ?></td>
                                         <td class="atg-label">—</td>
@@ -795,7 +795,7 @@
                             </div>
 
                             <div class="tab__content-item">
-                                <strong>ATG Sensor Configuration</strong> (6 channels)<br><br>
+                                <strong>ATG Sensor Configuration</strong> (8 channels)<br><br>
                                 <form method="post" action="save_data.php">
                                     <table>
                                         <tr>
@@ -811,7 +811,7 @@
                                             <th>Offset (mm)</th>
                                             <th>Kalibrasi</th>
                                         </tr>
-                                        <?php for ($i = 1; $i <= 6; $i++):
+                                        <?php for ($i = 1; $i <= 8; $i++):
                                             $s = isset($atg_sensors[$i]) ? $atg_sensors[$i] : array();
                                             $enabled = !empty($s['enabled']);
                                             $label = htmlspecialchars(isset($s['label']) ? $s['label'] : "Sensor $i");

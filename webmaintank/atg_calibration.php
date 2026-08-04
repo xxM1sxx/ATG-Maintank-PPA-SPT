@@ -12,7 +12,7 @@ require_once 'import_calibration.php';
 ensure_atg_tables($conn);
 
 $sensor_id = isset($_GET['sensor']) ? intval($_GET['sensor']) : 1;
-if ($sensor_id < 1 || $sensor_id > 6) {
+if ($sensor_id < 1 || $sensor_id > 8) {
     $sensor_id = 1;
 }
 
@@ -126,7 +126,7 @@ $display_count = count($points);
         <form method="get">
             Sensor:
             <select name="sensor" onchange="this.form.submit()">
-                <?php for ($i = 1; $i <= 6; $i++): ?>
+                <?php for ($i = 1; $i <= 8; $i++): ?>
                 <option value="<?php echo $i; ?>" <?php echo ($i === $sensor_id) ? 'selected' : ''; ?>>TANKI-<?php echo $i; ?></option>
                 <?php endfor; ?>
             </select>

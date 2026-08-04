@@ -1,7 +1,7 @@
 <?php
 function ensure_atg_tables($conn) {
     $conn->exec("CREATE TABLE IF NOT EXISTS tbl_atg_sensor (
-        id INTEGER PRIMARY KEY CHECK (id BETWEEN 1 AND 6),
+        id INTEGER PRIMARY KEY CHECK (id BETWEEN 1 AND 8),
         label TEXT NOT NULL DEFAULT '',
         enabled INTEGER NOT NULL DEFAULT 0,
         device TEXT NOT NULL DEFAULT '',
@@ -57,19 +57,29 @@ function ensure_atg_tables($conn) {
         }
     }
 
-    // Remove sensors 7-8 from legacy 8-channel schema
+    // Clean up stray rows beyond 8-channel schema
     try {
-        $conn->exec("DELETE FROM tbl_atg_reading WHERE sensor_id > 6");
-        $conn->exec("DELETE FROM tbl_atg_volume_point WHERE sensor_id > 6");
-        $conn->exec("DELETE FROM tbl_atg_sensor WHERE id > 6");
+        $conn->exec("DELETE FROM tbl_atg_reading WHERE sensor_id > 8");
+        $conn->exec("DELETE FROM tbl_atg_volume_point WHERE sensor_id > 8");
+        $conn->exec("DELETE FROM tbl_atg_sensor WHERE id > 8");
     } catch (PDOException $e) {
         // ignore
+    }
+
+    // Seed sensors 7-8 into existing tables that still have old CHECK(1..6) constraint
+    try {
+        $conn->exec("PRAGMA ignore_check_constraints = ON");
+        $conn->exec("INSERT OR IGNORE INTO tbl_atg_sensor (id, label, device) VALUES (7, 'TANKI-7', '/dev/ttyACM6'), (8, 'TANKI-8', '/dev/ttyACM7')");
+    } catch (PDOException $e) {
+        // ignore
+    } finally {
+        try { $conn->exec("PRAGMA ignore_check_constraints = OFF"); } catch (PDOException $e) {}
     }
 
     $stmt = $conn->query("SELECT COUNT(*) FROM tbl_atg_sensor");
     $count = $stmt->fetchColumn();
     if ($count == 0) {
-        for ($i = 1; $i <= 6; $i++) {
+        for ($i = 1; $i <= 8; $i++) {
             $label = "TANKI-$i";
             $device = "/dev/ttyACM" . ($i - 1);
             $insert = $conn->prepare(

@@ -20,7 +20,7 @@ $query = "SELECT s.id, s.label, s.enabled, s.device, s.slave_id, s.baudrate, s.p
                  r.ok, r.error_msg, r.updated_at
           FROM tbl_atg_sensor s
           LEFT JOIN tbl_atg_reading r ON r.sensor_id = s.id
-          WHERE s.id BETWEEN 1 AND 6
+          WHERE s.id BETWEEN 1 AND 8
           ORDER BY s.id";
 
 $stmt = $conn->query($query);
