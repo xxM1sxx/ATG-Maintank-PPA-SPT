@@ -72,7 +72,7 @@ void SensorManager::worker(SensorConfig cfg) {
             atg.set_response_timeout(cfg.timeout);
             if (de_pin) atg.set_de_pin(de_pin.get());
 
-            atg_debug_log("atg-reader",
+            atg_log(LogLevel::Info, "ATG",
                 "sensor=%d device=%s slave=%u connected (de_pin=%d timeout=%lldms interval=%lldms)",
                 cfg.id, cfg.device.c_str(), static_cast<unsigned>(cfg.slave_id),
                 cfg.de_gpio_pin,
@@ -106,12 +106,12 @@ void SensorManager::worker(SensorConfig cfg) {
 
                 if (result.ok && !result.readings.empty()) {
                     const auto& t = result.readings.front();
-                    atg_debug_log("atg-reader",
+                    atg_log(LogLevel::Info, "ATG",
                         "sensor=%d device=%s slave=%u ok=1 fuel=%.1fmm water=%.1fmm temp=%.1fC",
                         cfg.id, cfg.device.c_str(), static_cast<unsigned>(cfg.slave_id),
                         t.fuel_level_mm, t.water_level_mm, t.fuel_temp_c);
                 } else {
-                    atg_debug_log("atg-reader",
+                    atg_log(LogLevel::Warn, "ATG",
                         "sensor=%d device=%s slave=%u ok=0 error=%s",
                         cfg.id, cfg.device.c_str(), static_cast<unsigned>(cfg.slave_id),
                         result.error.c_str());
@@ -138,7 +138,7 @@ void SensorManager::worker(SensorConfig cfg) {
             }
             if (callback_) callback_(cfg.id, result);
 
-            atg_debug_log("atg-reader", "sensor=%d device=%s open failed: %s (retry 5s)",
+            atg_log(LogLevel::Error, "ATG", "sensor=%d device=%s open failed: %s (retry 5s)",
                 cfg.id, cfg.device.c_str(), ex.what());
 
             for (int i = 0; i < 50 && running_; ++i)

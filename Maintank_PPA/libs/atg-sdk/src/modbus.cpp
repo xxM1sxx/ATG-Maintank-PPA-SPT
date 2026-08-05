@@ -142,7 +142,7 @@ bool read_response(SerialPort& port, uint8_t* buf, size_t bufsize,
     if (pos > 0)
         atg_debug_hex("read_response failed", raw, pos);
     else
-        atg_debug_log("atg-debug", "read_response failed, got 0 bytes");
+        atg_log(LogLevel::Warn, "ATG", "read_response failed, got 0 bytes");
     return false;
 }
 

@@ -135,7 +135,7 @@ void AtgDatabase::upsert_reading(int sensor_id, const atg::SensorResult& r) {
             volume = vol;
             volume_valid = true;
         }
-        atg::atg_debug_log("atg-debug",
+        atg::atg_log(atg::LogLevel::Info, "ATG",
             "volume lookup sensor=%d probe=%.1fmm offset=%.1fmm sounding=%.1fmm points=%zu -> %.1f L",
             sensor_id, probe_mm, offset_mm, probe_mm + offset_mm, points.size(),
             volume_valid ? volume : -1.0);

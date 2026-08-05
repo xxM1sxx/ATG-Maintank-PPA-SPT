@@ -12,24 +12,25 @@ namespace {
 void on_connect(struct mosquitto* mosq, void* userdata, int reason_code) {
     (void)mosq; (void)userdata;
     if (reason_code == 0) {
-        atg::atg_debug_log("mqtt", "Connected to broker");
+        atg::atg_log(atg::LogLevel::Info, "MQTT", "Connected to broker");
     } else {
-        std::fprintf(stderr, "[MQTT] Connection failed: %s\n", mosquitto_connack_string(reason_code));
+        atg::atg_log(atg::LogLevel::Error, "MQTT", "Connection failed: %s", mosquitto_connack_string(reason_code));
     }
 }
 
 void on_disconnect(struct mosquitto* mosq, void* userdata, int reason_code) {
     (void)mosq; (void)userdata;
     if (reason_code == 0) {
-        atg::atg_debug_log("mqtt", "Disconnected (clean shutdown)");
+        atg::atg_log(atg::LogLevel::Info, "MQTT", "Disconnected (clean shutdown)");
     } else {
-        std::fprintf(stderr, "[MQTT] Disconnected (rc=%d)\n", reason_code);
+        atg::atg_log(atg::LogLevel::Warn, "MQTT", "Disconnected unexpectedly (rc=%d)", reason_code);
     }
 }
 
 void on_publish(struct mosquitto* mosq, void* userdata, int mid) {
-    (void)mosq; (void)userdata; (void)mid;
-    // Silent success - no logging needed for every publish
+    (void)mosq; (void)userdata;
+    // Broker PUBACK - confirms the message was actually delivered (QoS 1).
+    atg::atg_log(atg::LogLevel::Info, "MQTT", "Publish acknowledged by broker mid=%d", mid);
 }
 
 std::string get_iso_timestamp() {
@@ -52,12 +53,12 @@ MqttPublisher::~MqttPublisher() {
 
 bool MqttPublisher::init() {
     if (!config_.enabled) {
-        atg::atg_debug_log("mqtt", "MQTT publishing disabled");
+        atg::atg_log(atg::LogLevel::Info, "MQTT", "MQTT publishing disabled");
         return false;
     }
 
     if (config_.broker_host.empty()) {
-        std::fprintf(stderr, "[MQTT] Broker host not configured\n");
+        atg::atg_log(atg::LogLevel::Error, "MQTT", "Broker host not configured");
         return false;
     }
 
@@ -65,7 +66,7 @@ bool MqttPublisher::init() {
 
     mosq_ = mosquitto_new(nullptr, true, nullptr);
     if (mosq_ == nullptr) {
-        std::fprintf(stderr, "[MQTT] Failed to create mosquitto instance\n");
+        atg::atg_log(atg::LogLevel::Error, "MQTT", "Failed to create mosquitto instance");
         mosquitto_lib_cleanup();
         return false;
     }
@@ -77,7 +78,7 @@ bool MqttPublisher::init() {
     if (!config_.username.empty() && !config_.password.empty()) {
         int auth_result = mosquitto_username_pw_set(mosq_, config_.username.c_str(), config_.password.c_str());
         if (auth_result != MOSQ_ERR_SUCCESS) {
-            std::fprintf(stderr, "[MQTT] Failed to set auth: %s\n", mosquitto_strerror(auth_result));
+            atg::atg_log(atg::LogLevel::Error, "MQTT", "Failed to set auth: %s", mosquitto_strerror(auth_result));
             mosquitto_destroy(mosq_);
             mosq_ = nullptr;
             mosquitto_lib_cleanup();
@@ -87,20 +88,20 @@ bool MqttPublisher::init() {
 
     int connect_result = mosquitto_connect(mosq_, config_.broker_host.c_str(), config_.broker_port, 60);
     if (connect_result != MOSQ_ERR_SUCCESS) {
-        std::fprintf(stderr, "[MQTT] Initial connect failed: %s (will retry in background)\n",
+        atg::atg_log(atg::LogLevel::Warn, "MQTT", "Initial connect failed: %s (will retry in background)",
                      mosquitto_strerror(connect_result));
     }
 
     int loop_result = mosquitto_loop_start(mosq_);
     if (loop_result != MOSQ_ERR_SUCCESS) {
-        std::fprintf(stderr, "[MQTT] loop_start failed: %s\n", mosquitto_strerror(loop_result));
+        atg::atg_log(atg::LogLevel::Error, "MQTT", "loop_start failed: %s", mosquitto_strerror(loop_result));
         mosquitto_destroy(mosq_);
         mosq_ = nullptr;
         mosquitto_lib_cleanup();
         return false;
     }
 
-    atg::atg_debug_log("mqtt", "Initialized: %s:%d topic=%s", config_.broker_host.c_str(),
+    atg::atg_log(atg::LogLevel::Info, "MQTT", "Initialized: %s:%d topic=%s", config_.broker_host.c_str(),
                        config_.broker_port, config_.topic_path.c_str());
     last_publish_ = std::chrono::steady_clock::now();
     return true;
@@ -134,13 +135,20 @@ void MqttPublisher::publish_telemetry(const std::vector<SensorData>& sensors) {
     }
 
     std::string json = build_json(sensors);
+    int mid = 0;
 
     {
         std::lock_guard<std::mutex> lock(publish_mutex_);
-        int result = mosquitto_publish(mosq_, nullptr, config_.topic_path.c_str(),
+        int result = mosquitto_publish(mosq_, &mid, config_.topic_path.c_str(),
                                        static_cast<int>(json.size()), json.c_str(), 1, false);
         if (result != MOSQ_ERR_SUCCESS) {
-            std::fprintf(stderr, "[MQTT] Publish failed: %s\n", mosquitto_strerror(result));
+            atg::atg_log(atg::LogLevel::Error, "MQTT",
+                "Publish failed topic=%s sensors=%zu: %s",
+                config_.topic_path.c_str(), sensors.size(), mosquitto_strerror(result));
+        } else {
+            atg::atg_log(atg::LogLevel::Info, "MQTT",
+                "Publish queued mid=%d topic=%s sensors=%zu bytes=%zu",
+                mid, config_.topic_path.c_str(), sensors.size(), json.size());
         }
     }
 
@@ -163,7 +171,7 @@ void MqttPublisher::close() {
     connected_ = false;
 
     mosquitto_lib_cleanup();
-    atg::atg_debug_log("mqtt", "Closed");
+    atg::atg_log(atg::LogLevel::Info, "MQTT", "Closed");
 }
 
 std::string MqttPublisher::build_json(const std::vector<SensorData>& sensors) {
