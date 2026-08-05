@@ -1,0 +1,810 @@
+{
+  "nodes": [
+    {
+      "id": "maintak_ppa_project",
+      "label": "Maintak_PPA (root project)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "atg_sdk_library",
+      "label": "atg-sdk (C++17 RS485 sensor library)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "atg_reader_executable",
+      "label": "atg-reader (Modbus daemon)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "25-37",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "serialport_class",
+      "label": "SerialPort (RS485 serial interface)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "49-76",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "gpiopin_class",
+      "label": "GpioPin (sysfs GPIO DE/RE control)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "80-101",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "modbus_protocol",
+      "label": "modbus (Modbus RTU protocol)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "107-146",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "atgprotocol_class",
+      "label": "AtgProtocol (Holykell SP400 Modbus probe interface)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "149-186",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "atgconfig_class",
+      "label": "AtgConfig (centralized configuration)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "189-222",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "tankreading_struct",
+      "label": "TankReading (sensor reading data structure)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "175-183",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "sensormanager_class",
+      "label": "SensorManager (multi-sensor multi-threaded manager)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "226-285",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "sensorconfig_struct",
+      "label": "SensorConfig (sensor configuration)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "241-249",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "sensorresult_struct",
+      "label": "SensorResult (sensor operation result)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "251-258",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "modbus_cpp",
+      "label": "modbus.cpp (Modbus protocol implementation)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "8",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "atg_protocol_cpp",
+      "label": "atg_protocol.cpp (Holykell probe protocol)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "9",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "config_cpp",
+      "label": "config.cpp (configuration parsing)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "10",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "serial_port_cpp",
+      "label": "serial_port.cpp (Linux serial port I/O)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "17",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "gpio_cpp",
+      "label": "gpio.cpp (Linux sysfs GPIO)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "18",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "sensor_manager_cpp",
+      "label": "sensor_manager.cpp (multi-threaded sensor polling)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "19",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "platform_stub_win_cpp",
+      "label": "platform_stub_win.cpp (Windows stub implementation)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "14",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "main_cpp",
+      "label": "main.cpp (atg-reader entry point)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "26",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "atg_db_cpp",
+      "label": "atg_db.cpp (SQLite database operations)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "27",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "volume_lookup_cpp",
+      "label": "volume_lookup.cpp (calibration lookup)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "28",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "read_sensor_example",
+      "label": "read_sensor (example executable)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\examples\\CMakeLists.txt",
+      "source_location": "1",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "test_modbus_executable",
+      "label": "test_modbus (test executable)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\tests\\CMakeLists.txt",
+      "source_location": "3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "build_bbb_script",
+      "label": "build-bbb.sh (BeagleBone build and deploy)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "12",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "sp400_modbus_sim_py",
+      "label": "sp400_modbus_sim.py (Holykell probe simulator)",
+      "file_type": "code",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "115",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "atg_reader_service",
+      "label": "atg-reader.service (systemd unit)",
+      "file_type": "document",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "32",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "holykell_sp400_probe",
+      "label": "Holykell SP400 (ATG tank gauge probe)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "151",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "modbus_rtu_protocol",
+      "label": "Modbus RTU protocol",
+      "file_type": "rationale",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "3-4",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "rs485_communication",
+      "label": "RS485 half-duplex communication",
+      "file_type": "rationale",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "289-319",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "usb_rs485_adapter",
+      "label": "USB-to-RS485 adapter (hardware interface)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "289-319",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "float_encoding_type_10007",
+      "label": "Modbus type 10007 (Holykell IEEE float encoding)",
+      "file_type": "rationale",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "185",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "build_bbb_md",
+      "label": "BUILD-BBB.md (deployment documentation)",
+      "file_type": "document",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "atg_sdk_readme_md",
+      "label": "README.md (SDK API reference)",
+      "file_type": "document",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "beaglebone_linux_platform",
+      "label": "BeagleBone Linux (target platform)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "sqlite3_database",
+      "label": "SQLite3 (embedded database)",
+      "file_type": "concept",
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "17-18",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "maintak_ppa_project",
+      "target": "atg_sdk_library",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "12",
+      "weight": 1.0
+    },
+    {
+      "source": "atg_reader_executable",
+      "target": "atg_sdk_library",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "34",
+      "weight": 1.0
+    },
+    {
+      "source": "atg_reader_executable",
+      "target": "sqlite3_database",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "34",
+      "weight": 1.0
+    },
+    {
+      "source": "atgprotocol_class",
+      "target": "modbus_protocol",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "149-173",
+      "weight": 1.0
+    },
+    {
+      "source": "atgprotocol_class",
+      "target": "serialport_class",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "165",
+      "weight": 1.0
+    },
+    {
+      "source": "atgprotocol_class",
+      "target": "holykell_sp400_probe",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "151",
+      "weight": 1.0
+    },
+    {
+      "source": "serialport_class",
+      "target": "rs485_communication",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "49",
+      "weight": 1.0
+    },
+    {
+      "source": "serialport_class",
+      "target": "gpiopin_class",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "49-101",
+      "weight": 1.0
+    },
+    {
+      "source": "sensormanager_class",
+      "target": "serialport_class",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "34-35",
+      "weight": 1.0
+    },
+    {
+      "source": "sensormanager_class",
+      "target": "atgprotocol_class",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "272-280",
+      "weight": 1.0
+    },
+    {
+      "source": "sensormanager_class",
+      "target": "sensorconfig_struct",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "234",
+      "weight": 1.0
+    },
+    {
+      "source": "sensormanager_class",
+      "target": "sensorresult_struct",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "272",
+      "weight": 1.0
+    },
+    {
+      "source": "atgprotocol_class",
+      "target": "tankreading_struct",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "168-172",
+      "weight": 1.0
+    },
+    {
+      "source": "atg_protocol_cpp",
+      "target": "atgprotocol_class",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "9",
+      "weight": 1.0
+    },
+    {
+      "source": "modbus_cpp",
+      "target": "modbus_protocol",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "8",
+      "weight": 1.0
+    },
+    {
+      "source": "serial_port_cpp",
+      "target": "serialport_class",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "17",
+      "weight": 1.0
+    },
+    {
+      "source": "gpio_cpp",
+      "target": "gpiopin_class",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "18",
+      "weight": 1.0
+    },
+    {
+      "source": "sensor_manager_cpp",
+      "target": "sensormanager_class",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "19",
+      "weight": 1.0
+    },
+    {
+      "source": "config_cpp",
+      "target": "atgconfig_class",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt",
+      "source_location": "10",
+      "weight": 1.0
+    },
+    {
+      "source": "read_sensor_example",
+      "target": "atg_sdk_library",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\examples\\CMakeLists.txt",
+      "source_location": "2",
+      "weight": 1.0
+    },
+    {
+      "source": "test_modbus_executable",
+      "target": "atg_sdk_library",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\tests\\CMakeLists.txt",
+      "source_location": "4",
+      "weight": 1.0
+    },
+    {
+      "source": "test_modbus_executable",
+      "target": "volume_lookup_cpp",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\tests\\CMakeLists.txt",
+      "source_location": "7",
+      "weight": 1.0
+    },
+    {
+      "source": "main_cpp",
+      "target": "atgprotocol_class",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "74",
+      "weight": 1.0
+    },
+    {
+      "source": "main_cpp",
+      "target": "serialport_class",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "74",
+      "weight": 1.0
+    },
+    {
+      "source": "atg_db_cpp",
+      "target": "sqlite3_database",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\CMakeLists.txt",
+      "source_location": "27",
+      "weight": 1.0
+    },
+    {
+      "source": "build_bbb_script",
+      "target": "atg_reader_executable",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "12-20",
+      "weight": 1.0
+    },
+    {
+      "source": "sp400_modbus_sim_py",
+      "target": "holykell_sp400_probe",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "103-115",
+      "weight": 1.0
+    },
+    {
+      "source": "sp400_modbus_sim_py",
+      "target": "modbus_rtu_protocol",
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "115",
+      "weight": 1.0
+    },
+    {
+      "source": "atg_reader_service",
+      "target": "atg_reader_executable",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "32-35",
+      "weight": 1.0
+    },
+    {
+      "source": "build_bbb_md",
+      "target": "atg_reader_executable",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md",
+      "source_location": "1-212",
+      "weight": 1.0
+    },
+    {
+      "source": "atg_sdk_readme_md",
+      "target": "atg_sdk_library",
+      "relation": "cites",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "1-354",
+      "weight": 1.0
+    },
+    {
+      "source": "atgprotocol_class",
+      "target": "float_encoding_type_10007",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "185",
+      "weight": 1.0
+    },
+    {
+      "source": "usb_rs485_adapter",
+      "target": "rs485_communication",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "289-319",
+      "weight": 1.0
+    },
+    {
+      "source": "beaglebone_linux_platform",
+      "target": "atg_sdk_library",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "3",
+      "weight": 1.0
+    },
+    {
+      "source": "holykell_sp400_probe",
+      "target": "modbus_rtu_protocol",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "151",
+      "weight": 1.0
+    },
+    {
+      "source": "holykell_sp400_probe",
+      "target": "usb_rs485_adapter",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md",
+      "source_location": "151",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "sensor_polling_flow",
+      "label": "Multi-sensor polling architecture",
+      "nodes": [
+        "sensormanager_class",
+        "serialport_class",
+        "atgprotocol_class",
+        "modbus_protocol",
+        "tankreading_struct"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\README.md"
+    },
+    {
+      "id": "sdk_platform_abstractions",
+      "label": "Platform-specific abstraction layer",
+      "nodes": [
+        "serial_port_cpp",
+        "gpio_cpp",
+        "sensor_manager_cpp",
+        "platform_stub_win_cpp",
+        "beaglebone_linux_platform"
+      ],
+      "relation": "implement",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\libs\\atg-sdk\\CMakeLists.txt"
+    },
+    {
+      "id": "atg_reader_deployment",
+      "label": "ATG Reader deployment pipeline",
+      "nodes": [
+        "build_bbb_script",
+        "atg_reader_executable",
+        "atg_reader_service",
+        "beaglebone_linux_platform"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "D:\\Qimtronics\\ATG_Maintank_PPA\\Maintank_PPA\\BUILD-BBB.md"
+    }
+  ],
+  "input_tokens": 43984,
+  "output_tokens": 0
+}

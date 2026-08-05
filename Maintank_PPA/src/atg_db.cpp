@@ -168,4 +168,79 @@ void AtgDatabase::upsert_reading(int sensor_id, const atg::SensorResult& r) {
     sqlite3_finalize(stmt);
 }
 
+MqttConfig AtgDatabase::load_mqtt_config() {
+    MqttConfig config;
+
+    if (!db_) {
+        return config;  // Return defaults if DB not open
+    }
+
+    const char* sql = "SELECT broker_host, broker_port, username, password, topic_path, "
+                      "publish_interval_sec, enabled FROM tbl_atg_mqtt_setting WHERE id=1";
+
+    sqlite3_stmt* stmt = nullptr;
+    int rc = sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr);
+
+    if (rc != SQLITE_OK) {
+        return config;  // Return defaults if query fails
+    }
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        const char* host = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        config.broker_host = host ? host : "";
+        config.broker_port = sqlite3_column_int(stmt, 1);
+
+        const char* user = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        config.username = user ? user : "";
+
+        const char* pass = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        config.password = pass ? pass : "";
+
+        const char* topic = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+        config.topic_path = topic ? topic : "maintank/atg/value";
+
+        config.publish_interval_sec = sqlite3_column_int(stmt, 5);
+        config.enabled = sqlite3_column_int(stmt, 6) != 0;
+    }
+
+    sqlite3_finalize(stmt);
+    return config;
+}
+
+std::vector<SensorData> AtgDatabase::load_sensor_data_for_mqtt() {
+    std::vector<SensorData> sensors;
+    if (!db_) return sensors;
+
+    const char* sql =
+        "SELECT s.id, s.slocn, s.sensor_number, s.capacity_liters, "
+        "       r.position_mm, r.volume, r.fuel_temp_c "
+        "FROM tbl_atg_sensor s "
+        "LEFT JOIN tbl_atg_reading r ON s.id = r.sensor_id "
+        "WHERE s.enabled=1 ORDER BY s.id";
+
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK)
+        return sensors;
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        SensorData data;
+
+        const char* slocn = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        data.slocn = slocn ? slocn : "";
+
+        const char* number = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        data.number = number ? number : "";
+
+        data.capacity_l = sqlite3_column_double(stmt, 3);
+        data.fuel_level_mm = sqlite3_column_double(stmt, 4);
+        data.volume_l = sqlite3_column_double(stmt, 5);
+        data.temperature_c = sqlite3_column_double(stmt, 6);
+
+        sensors.push_back(data);
+    }
+
+    sqlite3_finalize(stmt);
+    return sensors;
+}
+
 } // namespace atg_app

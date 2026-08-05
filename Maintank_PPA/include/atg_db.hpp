@@ -1,9 +1,15 @@
 #pragma once
 
 #include "volume_lookup.hpp"
+#include "mqtt_publisher.hpp"
 #include <atg/sensor_manager.hpp>
 #include <sqlite3.h>
 #include <vector>
+#include <string>
+
+// Forward declare for atg_app namespace
+struct MqttConfig;
+struct SensorData;
 
 namespace atg_app {
 
@@ -17,6 +23,8 @@ public:
 
     std::vector<atg::SensorConfig> load_enabled_sensors();
     void upsert_reading(int sensor_id, const atg::SensorResult& result);
+    MqttConfig load_mqtt_config();
+    std::vector<SensorData> load_sensor_data_for_mqtt();
     bool is_open() const { return db_ != nullptr; }
 
 private:

@@ -26,12 +26,20 @@ if(ATG_BUILD_READER)
         src/main.cpp
         src/atg_db.cpp
         src/volume_lookup.cpp
+        src/mqtt_publisher.cpp
     )
     target_include_directories(atg-reader PRIVATE include)
     if(SQLITE3_INCLUDE_DIR)
         target_include_directories(atg-reader PRIVATE ${SQLITE3_INCLUDE_DIR})
     endif()
-    target_link_libraries(atg-reader PRIVATE atg-sdk ${ATG_SQLITE_LIBS} pthread)
+    find_library(MOSQUITTO_LIBRARY NAMES mosquitto)
+    if(MOSQUITTO_LIBRARY)
+        message(STATUS "Found libmosquitto: ${MOSQUITTO_LIBRARY}")
+        target_link_libraries(atg-reader PRIVATE atg-sdk ${ATG_SQLITE_LIBS} pthread ${MOSQUITTO_LIBRARY})
+    else()
+        message(WARNING "libmosquitto not found - MQTT support disabled")
+        target_link_libraries(atg-reader PRIVATE atg-sdk ${ATG_SQLITE_LIBS} pthread)
+    endif()
     target_compile_options(atg-reader PRIVATE -Wall -Wextra)
 
     install(TARGETS atg-reader RUNTIME DESTINATION bin)

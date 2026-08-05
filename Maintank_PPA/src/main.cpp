@@ -1,4 +1,5 @@
 #include "atg_db.hpp"
+#include "mqtt_publisher.hpp"
 #include <atg/debug_log.hpp>
 #include <atg/sensor_manager.hpp>
 #include <atomic>
@@ -52,17 +53,36 @@ int main(int argc, char* argv[]) {
 
         print_startup_banner(db_path, configs);
 
+        MqttConfig mqtt_config = db.load_mqtt_config();
+        MqttPublisher publisher(mqtt_config, "PT. Putra Perkasa Abadi", "PPA-BA");
+        if (mqtt_config.enabled) {
+            publisher.init();
+        }
+
         atg::SensorManager mgr(std::move(configs));
         mgr.set_callback([&db](int id, const atg::SensorResult& r) {
             db.upsert_reading(id, r);
         });
         mgr.start();
 
+        auto last_publish = std::chrono::steady_clock::now();
+
         while (g_running) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            if (mqtt_config.enabled) {
+                auto now = std::chrono::steady_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - last_publish).count();
+                if (elapsed >= mqtt_config.publish_interval_sec) {
+                    auto sensors = db.load_sensor_data_for_mqtt();
+                    publisher.publish_telemetry(sensors);
+                    last_publish = now;
+                }
+            }
         }
 
         mgr.stop();
+        publisher.close();
     } catch (const std::exception& ex) {
         std::cerr << "atg-reader: " << ex.what() << "\n";
         return 1;

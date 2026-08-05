@@ -328,6 +328,48 @@ if (isset($_POST['set_date_time'])) {
 	}
 }
 
+if (isset($_POST['sync_ntp'])) {
+	try {
+		$ntp_server = $_POST['ntp_server'] ?? 'pool.ntp.org';
+		$timezone_offset = $_POST['timezone_offset'] ?? '+7';
+
+		// Validate timezone format (e.g., +7, -5, +5:30)
+		if (!preg_match('/^[+-]\d{1,2}(:\d{2})?$/', $timezone_offset)) {
+			throw new Exception('Invalid timezone format. Use +7, -5, +5:30, etc.');
+		}
+
+		// Save timezone to database
+		$query = "UPDATE logger_settings SET timezone = :timezone";
+		$stmt = $conn->prepare($query);
+		$stmt->bindParam(':timezone', $timezone_offset);
+		$stmt->execute();
+
+		// Sync time with NTP server
+		// Using ntpdate if available, otherwise timedatectl
+		$ntp_cmd = "echo 1234 | sudo -S ntpdate -s " . escapeshellarg($ntp_server) . " 2>&1";
+		$ntp_result = shell_exec($ntp_cmd);
+
+		// Also try timedatectl as fallback
+		if (strpos($ntp_result, 'not found') !== false || strpos($ntp_result, 'command not found') !== false) {
+			$ntp_cmd = "echo 1234 | sudo -S timedatectl set-ntp true 2>&1";
+			shell_exec($ntp_cmd);
+		}
+
+		// Set system timezone
+		$tz_cmd = "echo 1234 | sudo -S timedatectl set-timezone 'UTC' 2>&1";
+		shell_exec($tz_cmd);
+
+		// Write to hardware clock
+		shell_exec("echo 1234 | sudo -S hwclock -w -f /dev/rtc0 2>&1");
+		shell_exec("echo 1234 | sudo -S hwclock -w -f /dev/rtc1 2>&1");
+
+		save_redirect('saved=ntp');
+	} catch (Exception $e) {
+		error_log('sync_ntp: ' . $e->getMessage());
+		save_redirect('error=' . urlencode($e->getMessage()));
+	}
+}
+
 if (isset($_POST['save_atg_sensors'])) {
 	try {
 		for ($i = 1; $i <= 8; $i++) {
@@ -480,5 +522,88 @@ if (isset($_POST['save_pss_setting'])) {
 		save_redirect('error=1');
 	}
 }
+
+	if(ISSET($_POST['save_mqtt_settings']))
+	{
+		try {
+			$broker_host = $_POST['mqtt_broker_host'] ?? '';
+			$broker_port = intval($_POST['mqtt_broker_port'] ?? 1883);
+			$username = $_POST['mqtt_username'] ?? '';
+			$password = $_POST['mqtt_password'] ?? '';
+			$topic_path = $_POST['mqtt_topic_path'] ?? 'maintank/atg/value';
+			$publish_interval = intval($_POST['mqtt_interval'] ?? 30);
+			$company_name = $_POST['mqtt_company'] ?? 'PT. Putra Perkasa Abadi';
+			$plant_id = $_POST['mqtt_plant_id'] ?? 'PPA-BA';
+
+			// Validation
+			if (empty($broker_host) || empty($username) || empty($password) || empty($topic_path)) {
+				throw new Exception('Broker host, username, password, and topic path are required');
+			}
+			if ($broker_port < 1 || $broker_port > 65535) {
+				throw new Exception('Invalid broker port');
+			}
+			if ($publish_interval < 1 || $publish_interval > 300) {
+				throw new Exception('Publish interval must be between 1 and 300 seconds');
+			}
+
+			$query = "UPDATE tbl_atg_mqtt_setting SET
+						broker_host = :broker_host,
+						broker_port = :broker_port,
+						username = :username,
+						password = :password,
+						topic_path = :topic_path,
+						publish_interval_sec = :publish_interval,
+						company_name = :company_name,
+						plant_id = :plant_id
+					  WHERE id = 1";
+			$stmt = $conn->prepare($query);
+			$stmt->bindParam(':broker_host', $broker_host);
+			$stmt->bindParam(':broker_port', $broker_port, PDO::PARAM_INT);
+			$stmt->bindParam(':username', $username);
+			$stmt->bindParam(':password', $password);
+			$stmt->bindParam(':topic_path', $topic_path);
+			$stmt->bindParam(':publish_interval', $publish_interval, PDO::PARAM_INT);
+			$stmt->bindParam(':company_name', $company_name);
+			$stmt->bindParam(':plant_id', $plant_id);
+			$stmt->execute();
+
+			header('location: home.php');
+			$conn = null;
+		} catch (Exception $e) {
+			error_log('save_mqtt_settings: ' . $e->getMessage());
+			header('location: home.php?error=' . urlencode($e->getMessage()));
+			$conn = null;
+		}
+	}
+
+	if(ISSET($_POST['save_sensor_metadata']))
+	{
+		try {
+			for ($i = 1; $i <= 8; $i++) {
+				$slocn = $_POST["sensor_slocn_$i"] ?? "FS-0$i";
+				$sensor_number = $_POST["sensor_number_$i"] ?? sprintf('%02d', $i);
+				$capacity = floatval($_POST["sensor_capacity_$i"] ?? 40000.0);
+
+				$query = "UPDATE tbl_atg_sensor SET
+							slocn = :slocn,
+							sensor_number = :sensor_number,
+							capacity_liters = :capacity
+						  WHERE id = :id";
+				$stmt = $conn->prepare($query);
+				$stmt->bindParam(':slocn', $slocn);
+				$stmt->bindParam(':sensor_number', $sensor_number);
+				$stmt->bindParam(':capacity', $capacity);
+				$stmt->bindParam(':id', $i, PDO::PARAM_INT);
+				$stmt->execute();
+			}
+
+			header('location: home.php');
+			$conn = null;
+		} catch (Exception $e) {
+			error_log('save_sensor_metadata: ' . $e->getMessage());
+			header('location: home.php?error=' . urlencode($e->getMessage()));
+			$conn = null;
+		}
+	}
 
 save_redirect();

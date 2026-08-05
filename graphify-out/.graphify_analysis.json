@@ -1,0 +1,626 @@
+{
+  "communities": {
+    "0": [
+      "atomic",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_hpp_bps",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_hpp_callback",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_hpp_milliseconds",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_hpp_string",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig_baudrate",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig_de_gpio_pin",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig_device",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig_enabled",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig_id",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig_polling_interval",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig_slave_id",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig_timeout",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_configs",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_latest",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_latest_mutex",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_running",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_sensormanager",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_set_callback",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_start",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_threads",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_worker",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorresult",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorresult_error",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorresult_id",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorresult_ok",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorresult_readings",
+      "maintank_ppa_src_main",
+      "maintank_ppa_src_main_cpp_vector",
+      "maintank_ppa_src_main_main",
+      "maintank_ppa_src_main_on_signal",
+      "maintank_ppa_src_main_print_startup_banner",
+      "map",
+      "mutex",
+      "thread"
+    ],
+    "1": [
+      "maintank_ppa_include_atg_db",
+      "maintank_ppa_include_atg_db_atgdatabase",
+      "maintank_ppa_include_atg_db_atgdatabase_atgdatabase",
+      "maintank_ppa_include_atg_db_atgdatabase_db",
+      "maintank_ppa_include_atg_db_atgdatabase_is_open",
+      "maintank_ppa_include_atg_db_atgdatabase_load_enabled_sensors",
+      "maintank_ppa_include_atg_db_atgdatabase_load_offset_mm",
+      "maintank_ppa_include_atg_db_atgdatabase_load_volume_points",
+      "maintank_ppa_include_atg_db_atgdatabase_upsert_reading",
+      "maintank_ppa_include_volume_lookup",
+      "maintank_ppa_include_volume_lookup_volumepoint",
+      "maintank_ppa_include_volume_lookup_volumepoint_sounding_mm",
+      "maintank_ppa_include_volume_lookup_volumepoint_volume_l",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_hpp_vector",
+      "maintank_ppa_src_atg_db",
+      "maintank_ppa_src_atg_db_atgdatabase_atgdatabase",
+      "maintank_ppa_src_atg_db_atgdatabase_load_enabled_sensors",
+      "maintank_ppa_src_atg_db_atgdatabase_load_offset_mm",
+      "maintank_ppa_src_atg_db_atgdatabase_load_volume_points",
+      "maintank_ppa_src_atg_db_atgdatabase_upsert_reading",
+      "maintank_ppa_src_atg_db_cpp_string",
+      "maintank_ppa_src_atg_db_cpp_vector",
+      "maintank_ppa_src_atg_db_iso_timestamp",
+      "maintank_ppa_src_volume_lookup",
+      "maintank_ppa_src_volume_lookup_cpp_vector",
+      "maintank_ppa_src_volume_lookup_lookup_volume_liters",
+      "maintank_ppa_src_volume_lookup_volumelookupselfcheck",
+      "maintank_ppa_src_volume_lookup_volumelookupselfcheck_volumelookupselfcheck",
+      "sqlite3"
+    ],
+    "2": [
+      "floatformat",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_parse_sp400_payload",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_read_input_registers",
+      "maintank_ppa_libs_atg_sdk_include_atg_debug_log",
+      "maintank_ppa_libs_atg_sdk_include_atg_debug_log_atg_debug_enabled",
+      "maintank_ppa_libs_atg_sdk_include_atg_debug_log_atg_debug_hex",
+      "maintank_ppa_libs_atg_sdk_include_atg_debug_log_atg_debug_log",
+      "maintank_ppa_libs_atg_sdk_include_atg_debug_log_atg_debug_timestamp",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_atgprotocol",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_parse_sp400_payload",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_read_all",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_read_input_registers",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_set_response_timeout",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_set_volume_converter",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_cpp_milliseconds",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_cpp_serialport",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_cpp_vector",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_cpp_volumeconverter",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_float_format",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_modbus_exception_text",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_modbus_response_len",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_parse_float4",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_parse_ieee_float_10007",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_rs485_delay_ms",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_rs485_turnaround_delay",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_rts_de_enabled"
+    ],
+    "3": [
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_baudrate",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_data_bits",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_de_gpio_pin",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_defaults",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_device",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_from_args",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_from_file",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_parity",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_polling_interval_ms",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_re_gpio_pin",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_read_timeout",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_register_count",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_slave_id",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_start_register",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig_stop_bits",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_hpp_bps",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_hpp_databits",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_hpp_milliseconds",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_hpp_parity",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_hpp_stopbits",
+      "maintank_ppa_libs_atg_sdk_src_config",
+      "maintank_ppa_libs_atg_sdk_src_config_atgconfig_defaults",
+      "maintank_ppa_libs_atg_sdk_src_config_atgconfig_from_args",
+      "maintank_ppa_libs_atg_sdk_src_config_atgconfig_from_file"
+    ],
+    "4": [
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_close",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_cpp_bps",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_cpp_databits",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_cpp_milliseconds",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_cpp_parity",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_cpp_serialport",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_cpp_stopbits",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_cpp_string",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_gpiopin_export_pin",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_gpiopin_get",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_gpiopin_gpiopin",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_gpiopin_is_exported",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_gpiopin_set",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_gpiopin_unexport_pin",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_close",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_configure",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_flush_input",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_is_open",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_open",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_read",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_serialport",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_set_rts",
+      "maintank_ppa_libs_atg_sdk_src_platform_stub_win_serialport_write"
+    ],
+    "5": [
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_hpp_bps",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_hpp_databits",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_hpp_milliseconds",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_hpp_parity",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_hpp_stopbits",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_hpp_string",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_baudrate",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_configure",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_data_bits",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_device",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_fd",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_flush_input",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_is_open",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_native_handle",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_open",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_parity",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_read",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_read_timeout",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_serialport",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_set_rts",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_stop_bits",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport_write"
+    ],
+    "6": [
+      "maintank_ppa_libs_atg_sdk_examples_read_sensor",
+      "maintank_ppa_libs_atg_sdk_examples_read_sensor_main",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_de_pin",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_ksp400inputregcount",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_ksp400inputregstart",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_read_all",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_read_tera_volume",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_read_water",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_set_de_pin",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_set_response_timeout",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_set_volume_converter",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_slave_id",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_timeout",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_hpp_milliseconds",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_hpp_volumeconverter",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_serialport",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_get",
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_callback",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_read_volume",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_sensormanager_worker"
+    ],
+    "7": [
+      "atg_protocol_cpp",
+      "atgprotocol_class",
+      "float_encoding_type_10007",
+      "gpio_cpp",
+      "gpiopin_class",
+      "holykell_sp400_probe",
+      "main_cpp",
+      "modbus_cpp",
+      "modbus_protocol",
+      "modbus_rtu_protocol",
+      "rs485_communication",
+      "sensor_manager_cpp",
+      "sensorconfig_struct",
+      "sensormanager_class",
+      "sensorresult_struct",
+      "serial_port_cpp",
+      "serialport_class",
+      "sp400_modbus_sim_py",
+      "tankreading_struct",
+      "usb_rs485_adapter"
+    ],
+    "8": [
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_dir_path",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_export_pin",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_fd_value",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_gpio",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_gpio_number",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_gpiopin",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_is_exported",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_is_valid",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_set",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin_unexport_pin",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio_hpp_string",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_set_de_pin",
+      "maintank_ppa_libs_atg_sdk_src_gpio",
+      "maintank_ppa_libs_atg_sdk_src_gpio_gpiopin_export_pin",
+      "maintank_ppa_libs_atg_sdk_src_gpio_gpiopin_get",
+      "maintank_ppa_libs_atg_sdk_src_gpio_gpiopin_gpiopin",
+      "maintank_ppa_libs_atg_sdk_src_gpio_gpiopin_is_exported",
+      "maintank_ppa_libs_atg_sdk_src_gpio_gpiopin_set",
+      "maintank_ppa_libs_atg_sdk_src_gpio_gpiopin_unexport_pin"
+    ],
+    "9": [
+      "maintank_ppa_libs_atg_sdk_src_serial_port",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_cpp_bps",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_cpp_databits",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_cpp_milliseconds",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_cpp_parity",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_cpp_serialport",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_cpp_stopbits",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_cpp_string",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_close",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_configure",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_flush_input",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_is_open",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_open",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_read",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_serialport",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_set_rts",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_serialport_write",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_to_posix_baud",
+      "maintank_ppa_libs_atg_sdk_src_serial_port_to_posix_parity",
+      "speed_t"
+    ],
+    "10": [
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_converter",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol_read_volume",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_hpp_string",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_fuel_level_mm",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_fuel_temp_c",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_position_mm",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_tank_number",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_temp_a_c",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_temp_b_c",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_temp_c_c",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_temp_d_c",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_temp_e_c",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_timestamp",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_volume",
+      "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading_water_level_mm",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_read_tera_volume",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_atgprotocol_read_water",
+      "maintank_ppa_libs_atg_sdk_src_atg_protocol_cpp_string"
+    ],
+    "11": [
+      "atg_db_cpp",
+      "atg_reader_executable",
+      "atg_reader_service",
+      "atg_sdk_library",
+      "beaglebone_linux_platform",
+      "maintak_ppa_project",
+      "maintank_ppa_build_bbb_md",
+      "maintank_ppa_build_bbb_script",
+      "maintank_ppa_libs_atg_sdk_readme_md",
+      "read_sensor_example",
+      "sqlite3_database",
+      "test_modbus_executable",
+      "volume_lookup_cpp"
+    ],
+    "12": [
+      "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager_stop",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_bps_from_int",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_cpp_bps",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_cpp_callback",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_cpp_vector",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_sensormanager_latest",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_sensormanager_sensormanager",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_sensormanager_set_callback",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_sensormanager_start",
+      "maintank_ppa_libs_atg_sdk_src_sensor_manager_sensormanager_stop"
+    ],
+    "13": [
+      "maintank_ppa_libs_atg_sdk_src_modbus",
+      "maintank_ppa_libs_atg_sdk_src_modbus_build_request",
+      "maintank_ppa_libs_atg_sdk_src_modbus_cpp_milliseconds",
+      "maintank_ppa_libs_atg_sdk_src_modbus_cpp_serialport",
+      "maintank_ppa_libs_atg_sdk_src_modbus_crc16",
+      "maintank_ppa_libs_atg_sdk_src_modbus_find_frame",
+      "maintank_ppa_libs_atg_sdk_src_modbus_frame_len_at",
+      "maintank_ppa_libs_atg_sdk_src_modbus_frame_length",
+      "maintank_ppa_libs_atg_sdk_src_modbus_read_response",
+      "maintank_ppa_libs_atg_sdk_src_modbus_send_request",
+      "modbusfunc"
+    ],
+    "14": [
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_main",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_build_request",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_config_defaults",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_crc16",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_fc04_response_frame",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_find_frame",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_sp400_float_parse",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_sp400_fuel_volume_only",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_sp400_modbus_request",
+      "maintank_ppa_libs_atg_sdk_tests_test_modbus_test_sp400_modbus_slave_regs"
+    ],
+    "15": [
+      "maintank_ppa_libs_atg_sdk_include_atg_atg",
+      "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol",
+      "maintank_ppa_libs_atg_sdk_include_atg_config",
+      "maintank_ppa_libs_atg_sdk_include_atg_config_hpp_string",
+      "maintank_ppa_libs_atg_sdk_include_atg_gpio",
+      "maintank_ppa_libs_atg_sdk_include_atg_modbus",
+      "maintank_ppa_libs_atg_sdk_include_atg_modbus_serialport",
+      "maintank_ppa_libs_atg_sdk_include_atg_serial_port",
+      "maintank_ppa_libs_atg_sdk_include_atg_types"
+    ],
+    "16": [
+      "webmaintank_file_manager",
+      "webmaintank_file_manager_asbytes",
+      "webmaintank_file_manager_err",
+      "webmaintank_file_manager_get_absolute_path",
+      "webmaintank_file_manager_is_entry_ignored",
+      "webmaintank_file_manager_is_recursively_deleteable",
+      "webmaintank_file_manager_rmrf"
+    ],
+    "17": [
+      "tools_extract_calibration_pdf",
+      "tools_extract_calibration_pdf_extract_pairs",
+      "tools_extract_calibration_pdf_main",
+      "tools_extract_calibration_pdf_parse_num"
+    ],
+    "18": [
+      "webmaintank_syslog_logrotate_helper",
+      "webmaintank_syslog_logrotate_helper_build_rsyslog_logrotate_content",
+      "webmaintank_syslog_logrotate_helper_sync_rsyslog_logrotate_from_db",
+      "webmaintank_syslog_logrotate_helper_update_rsyslog_logrotate_config"
+    ],
+    "19": [
+      "webmaintank_import_calibration",
+      "webmaintank_import_calibration_calibration_seed_path",
+      "webmaintank_import_calibration_import_calibration_csv"
+    ],
+    "20": [
+      "webmaintank_reboot_schedule_helper",
+      "webmaintank_reboot_schedule_helper_sync_reboot_schedule_from_db",
+      "webmaintank_reboot_schedule_helper_update_reboot_schedule_cron_config"
+    ],
+    "21": [
+      "atgconfig_class",
+      "config_cpp"
+    ],
+    "22": [
+      "maintank_ppa_scripts_build_bbb",
+      "maintank_ppa_scripts_build_bbb_sh__entry"
+    ],
+    "23": [
+      "webmaintank_init_atg_table",
+      "webmaintank_init_atg_table_ensure_atg_tables"
+    ],
+    "24": [
+      "webmaintank_init_logger_settings",
+      "webmaintank_init_logger_settings_ensure_logger_settings_columns"
+    ],
+    "25": [
+      "webmaintank_save_data",
+      "webmaintank_save_data_save_redirect"
+    ],
+    "26": [
+      "platform_stub_win_cpp"
+    ],
+    "27": [
+      "webmaintank_action_logout"
+    ],
+    "28": [
+      "webmaintank_atg_calibration"
+    ],
+    "29": [
+      "webmaintank_check_pss"
+    ],
+    "30": [
+      "webmaintank_conn"
+    ],
+    "31": [
+      "webmaintank_conn_pss"
+    ],
+    "32": [
+      "webmaintank_get_atg_readings"
+    ],
+    "33": [
+      "webmaintank_home"
+    ],
+    "34": [
+      "webmaintank_index"
+    ],
+    "35": [
+      "webmaintank_login_query"
+    ],
+    "36": [
+      "webmaintank_waktu"
+    ]
+  },
+  "cohesion": {
+    "0": 0.06685633001422475,
+    "1": 0.08866995073891626,
+    "2": 0.1282051282051282,
+    "3": 0.08666666666666667,
+    "4": 0.08333333333333333,
+    "5": 0.08695652173913043,
+    "6": 0.11904761904761904,
+    "7": 0.12105263157894737,
+    "8": 0.11052631578947368,
+    "9": 0.11578947368421053,
+    "10": 0.10526315789473684,
+    "11": 0.15384615384615385,
+    "12": 0.18181818181818182,
+    "13": 0.2909090909090909,
+    "14": 0.34545454545454546,
+    "15": 0.4444444444444444,
+    "16": 0.2857142857142857,
+    "17": 0.8333333333333334,
+    "18": 0.8333333333333334,
+    "19": 0.6666666666666666,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0,
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0
+  },
+  "gods": [
+    {
+      "id": "maintank_ppa_libs_atg_sdk_include_atg_config_atgconfig",
+      "label": "AtgConfig",
+      "degree": 25
+    },
+    {
+      "id": "maintank_ppa_libs_atg_sdk_include_atg_serial_port_serialport",
+      "label": "SerialPort",
+      "degree": 24
+    },
+    {
+      "id": "maintank_ppa_libs_atg_sdk_include_atg_atg_protocol_atgprotocol",
+      "label": "AtgProtocol",
+      "degree": 21
+    },
+    {
+      "id": "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensormanager",
+      "label": "SensorManager",
+      "degree": 20
+    },
+    {
+      "id": "maintank_ppa_libs_atg_sdk_include_atg_types_tankreading",
+      "label": "TankReading",
+      "degree": 20
+    },
+    {
+      "id": "maintank_ppa_libs_atg_sdk_include_atg_gpio_gpiopin",
+      "label": "GpioPin",
+      "degree": 17
+    },
+    {
+      "id": "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorconfig",
+      "label": "SensorConfig",
+      "degree": 16
+    },
+    {
+      "id": "maintank_ppa_libs_atg_sdk_include_atg_sensor_manager_sensorresult",
+      "label": "SensorResult",
+      "degree": 11
+    },
+    {
+      "id": "maintank_ppa_libs_atg_sdk_tests_test_modbus_main",
+      "label": "main()",
+      "degree": 10
+    },
+    {
+      "id": "maintank_ppa_include_atg_db_atgdatabase",
+      "label": "AtgDatabase",
+      "degree": 9
+    }
+  ],
+  "surprises": [
+    {
+      "source": "AtgDatabase::upsert_reading()",
+      "target": "load_offset_mm",
+      "source_files": [
+        "Maintank_PPA/src/atg_db.cpp",
+        "Maintank_PPA/include/atg_db.hpp"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `load_offset_mm` unexpectedly reaches hub `AtgDatabase::upsert_reading()`"
+    },
+    {
+      "source": "AtgDatabase::upsert_reading()",
+      "target": "load_volume_points",
+      "source_files": [
+        "Maintank_PPA/src/atg_db.cpp",
+        "Maintank_PPA/include/atg_db.hpp"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `load_volume_points` unexpectedly reaches hub `AtgDatabase::upsert_reading()`"
+    },
+    {
+      "source": "main()",
+      "target": "get",
+      "source_files": [
+        "Maintank_PPA/libs/atg-sdk/examples/read_sensor.cpp",
+        "Maintank_PPA/libs/atg-sdk/include/atg/gpio.hpp"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `get` unexpectedly reaches hub `main()`"
+    },
+    {
+      "source": "AtgProtocol::read_all()",
+      "target": "read_input_registers",
+      "source_files": [
+        "Maintank_PPA/libs/atg-sdk/src/atg_protocol.cpp",
+        "Maintank_PPA/libs/atg-sdk/include/atg/atg_protocol.hpp"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `read_input_registers` unexpectedly reaches hub `AtgProtocol::read_all()`"
+    },
+    {
+      "source": "AtgProtocol::read_all()",
+      "target": "parse_sp400_payload",
+      "source_files": [
+        "Maintank_PPA/libs/atg-sdk/src/atg_protocol.cpp",
+        "Maintank_PPA/libs/atg-sdk/include/atg/atg_protocol.hpp"
+      ],
+      "confidence": "INFERRED",
+      "relation": "calls",
+      "why": "inferred connection - not explicitly stated in source; peripheral node `parse_sp400_payload` unexpectedly reaches hub `AtgProtocol::read_all()`"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `SerialPort` connect `Community 5` to `Community 4`, `Community 15`?",
+      "why": "High betweenness centrality (0.162) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `GpioPin` connect `Community 8` to `Community 4`, `Community 6`, `Community 15`?",
+      "why": "High betweenness centrality (0.148) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `AtgConfig` connect `Community 3` to `Community 15`?",
+      "why": "High betweenness centrality (0.101) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `load_enabled_sensors`, `upsert_reading`, `db_` to the rest of the system?",
+      "why": "100 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06685633001422475 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.08866995073891626 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.1282051282051282 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

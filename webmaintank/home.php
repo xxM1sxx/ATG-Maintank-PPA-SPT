@@ -314,22 +314,30 @@
 			}
 		}
 
-        $data_mqtt_broker = '';
-        $data_mqtt_port = '';
+        // Load ATG MQTT Settings
+        $data_mqtt_broker_host = '192.168.1.10';
+        $data_mqtt_broker_port = 1883;
         $data_mqtt_username = '';
         $data_mqtt_password = '';
-        $data_mqtt_topic = '';
-        $result_mqtt_setting = $db->query("SELECT * FROM TBL_MQTT_SETTING"); 
-		if ($result_mqtt_setting) {
-			$data_mqtt_setting = $result_mqtt_setting->fetchArray();
-			if ($data_mqtt_setting) {
-				$data_mqtt_broker = $data_mqtt_setting[1]; 
-				$data_mqtt_port = $data_mqtt_setting[2]; 
-				$data_mqtt_username = $data_mqtt_setting[3]; 
-				$data_mqtt_password = $data_mqtt_setting[4]; 
-				$data_mqtt_topic = $data_mqtt_setting[5];
-			}
-		}
+        $data_mqtt_topic_path = 'maintank/atg/value';
+        $data_mqtt_interval = 30;
+        $data_mqtt_company = 'PT. Putra Perkasa Abadi';
+        $data_mqtt_plant_id = 'PPA-BA';
+
+        $result_mqtt = $db->query("SELECT * FROM tbl_atg_mqtt_setting WHERE id=1");
+        if ($result_mqtt) {
+            $row_mqtt = $result_mqtt->fetchArray(SQLITE3_ASSOC);
+            if ($row_mqtt) {
+                $data_mqtt_broker_host = $row_mqtt['broker_host'] ?? '192.168.1.10';
+                $data_mqtt_broker_port = intval($row_mqtt['broker_port'] ?? 1883);
+                $data_mqtt_username = $row_mqtt['username'] ?? '';
+                $data_mqtt_password = $row_mqtt['password'] ?? '';
+                $data_mqtt_topic_path = $row_mqtt['topic_path'] ?? 'maintank/atg/value';
+                $data_mqtt_interval = intval($row_mqtt['publish_interval_sec'] ?? 30);
+                $data_mqtt_company = $row_mqtt['company_name'] ?? 'PT. Putra Perkasa Abadi';
+                $data_mqtt_plant_id = $row_mqtt['plant_id'] ?? 'PPA-BA';
+            }
+        }
 
 		$atg_sensors = array();
 		$result_atg = $db->query("SELECT * FROM tbl_atg_sensor ORDER BY id");
@@ -373,10 +381,19 @@
 
 <body>
     <h1>ATG Maintank</h1>
-    <?php if (isset($_GET['saved'])): ?>
-    <p style="color: green; text-align: center;">Settings saved.</p>
+    <?php if (isset($_GET['saved'])):
+        $saved = $_GET['saved'];
+        if ($saved === 'ntp') {
+            $msg = '✓ Time synchronized with NTP successfully!';
+        } elseif ($saved === 'datetime') {
+            $msg = '✓ Date and time updated successfully!';
+        } else {
+            $msg = '✓ Settings saved successfully!';
+        }
+    ?>
+    <p style="color: green; text-align: center;"><?php echo $msg; ?></p>
     <?php elseif (isset($_GET['error'])): ?>
-    <p style="color: red; text-align: center;">Save failed — check server log.</p>
+    <p style="color: red; text-align: center;">❌ Error: <?php echo htmlspecialchars($_GET['error'] ?? 'Save failed'); ?></p>
     <?php endif; ?>
     <span style="float:right;">
         <h2>Welcome, <?php echo $_SESSION['username']; ?></h2>
@@ -570,6 +587,12 @@
                             </div>
                             <div class="tab__item">
                                 ATG Sensors
+                            </div>
+                            <div class="tab__item">
+                                MQTT Settings
+                            </div>
+                            <div class="tab__item">
+                                Sensor Metadata
                             </div>
                             <!-- <?php
 							if ($privilege_user == "Superuser")
@@ -766,6 +789,21 @@
                                     <input type="submit" name="set_date_time" value=" Set Date Time "><br><br>
                                 </form>
 
+                                <strong>Synchronize Time with NTP</strong><br>
+                                <form method="post" action="save_data.php">
+                                    <label for="ntp_server">NTP Server</label>
+                                    <input type="text" id="ntp_server" name="ntp_server"
+                                        value="<?php echo htmlspecialchars($data_ip_address_ntp ?? 'pool.ntp.org'); ?>"
+                                        placeholder="pool.ntp.org"><br>
+
+                                    <label for="timezone_offset">Timezone (GMT Offset, e.g., +7 for WIB)</label>
+                                    <input type="text" id="timezone_offset" name="timezone_offset"
+                                        value="<?php echo htmlspecialchars($data_timezone ?? '+7'); ?>"
+                                        placeholder="+7" size="5"><br>
+
+                                    <input type="submit" name="sync_ntp" value=" Sync Time with NTP "><br><br>
+                                </form>
+
                                 <strong>Schedule Reboot</strong><br>
                                 <form method="post" action="save_data.php">
                                     <label for="data_reboot_schedule_enable">Enable Schedule </label>
@@ -849,6 +887,65 @@
                                     <input type="submit" name="save_atg_sensors" value=" Save ATG Settings ">
                                 </form>
                             </div>
+                                                        <div class="tab__content-item">
+                                <strong>MQTT Settings</strong><br><br>
+                                <form method="post" action="save_data.php">
+                                    <label for="mqtt_broker_host">Broker Host (required)</label>
+                                    <input type="text" id="mqtt_broker_host" name="mqtt_broker_host" value="<?php echo htmlspecialchars($data_mqtt_broker_host); ?>" required><br>
+
+                                    <label for="mqtt_broker_port">Broker Port</label>
+                                    <input type="number" id="mqtt_broker_port" name="mqtt_broker_port" value="<?php echo $data_mqtt_broker_port; ?>" min="1" max="65535"><br>
+
+                                    <label for="mqtt_username">Username (required)</label>
+                                    <input type="text" id="mqtt_username" name="mqtt_username" value="<?php echo htmlspecialchars($data_mqtt_username); ?>" required><br>
+
+                                    <label for="mqtt_password">Password (required)</label>
+                                    <input type="password" id="mqtt_password" name="mqtt_password" value="<?php echo htmlspecialchars($data_mqtt_password); ?>" required><br>
+
+                                    <label for="mqtt_topic_path">Topic Path</label>
+                                    <input type="text" id="mqtt_topic_path" name="mqtt_topic_path" value="<?php echo htmlspecialchars($data_mqtt_topic_path); ?>" required><br>
+
+                                    <label for="mqtt_interval">Publish Interval (seconds)</label>
+                                    <input type="number" id="mqtt_interval" name="mqtt_interval" value="<?php echo $data_mqtt_interval; ?>" min="1" max="300"><br>
+
+                                    <label for="mqtt_company">Company Name</label>
+                                    <input type="text" id="mqtt_company" name="mqtt_company" value="<?php echo htmlspecialchars($data_mqtt_company); ?>"><br>
+
+                                    <label for="mqtt_plant_id">Plant ID</label>
+                                    <input type="text" id="mqtt_plant_id" name="mqtt_plant_id" value="<?php echo htmlspecialchars($data_mqtt_plant_id); ?>"><br><br>
+
+                                    <input type="submit" name="save_mqtt_settings" value=" Save MQTT Settings ">
+                                </form>
+                            </div>
+
+                            <div class="tab__content-item">
+                                <strong>ATG Sensor Metadata (for MQTT)</strong><br><br>
+                                <form method="post" action="save_data.php">
+                                    <table>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Location (slocn)</th>
+                                            <th>Sensor Number</th>
+                                            <th>Capacity (liters)</th>
+                                        </tr>
+                                        <?php for ($i = 1; $i <= 8; $i++):
+                                            $s = isset($atg_sensors[$i]) ? $atg_sensors[$i] : array();
+                                            $slocn = htmlspecialchars(isset($s['slocn']) ? $s['slocn'] : "FS-0{$i}");
+                                            $sensor_number = htmlspecialchars(isset($s['sensor_number']) ? $s['sensor_number'] : str_pad($i, 2, '0', STR_PAD_LEFT));
+                                            $capacity_liters = floatval(isset($s['capacity_liters']) ? $s['capacity_liters'] : 40000);
+                                        ?>
+                                        <tr>
+                                            <td><?php echo $i; ?></td>
+                                            <td><input type="text" name="sensor_slocn_<?php echo $i; ?>" value="<?php echo $slocn; ?>" size="20"></td>
+                                            <td><input type="text" name="sensor_number_<?php echo $i; ?>" value="<?php echo $sensor_number; ?>" size="10"></td>
+                                            <td><input type="number" name="sensor_capacity_<?php echo $i; ?>" value="<?php echo $capacity_liters; ?>" step="0.1" size="10"></td>
+                                        </tr>
+                                        <?php endfor; ?>
+                                    </table>
+                                    <br>
+                                    <input type="submit" name="save_sensor_metadata" value=" Save Sensor Metadata ">
+                                </form>
+                            </div>
 
                             <!-- pss-->
                             <?php
@@ -894,8 +991,6 @@
 									</form>
 								<?php endif; ?>
 							</div>
-
-
 
 
 

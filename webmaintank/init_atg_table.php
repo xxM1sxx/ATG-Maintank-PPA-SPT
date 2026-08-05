@@ -17,6 +17,9 @@ function ensure_atg_tables($conn) {
     foreach (array(
         'zero_offset_mm REAL NOT NULL DEFAULT 0',
         'offset_mm REAL NOT NULL DEFAULT 0',
+        'slocn TEXT NOT NULL DEFAULT \'FS-01\'',
+        'sensor_number TEXT NOT NULL DEFAULT \'01\'',
+        'capacity_liters REAL NOT NULL DEFAULT 40000.0',
     ) as $col) {
         try {
             $conn->exec("ALTER TABLE tbl_atg_sensor ADD COLUMN $col");
@@ -55,6 +58,30 @@ function ensure_atg_tables($conn) {
         } catch (PDOException $e) {
             // column already exists
         }
+    }
+
+    $conn->exec("CREATE TABLE IF NOT EXISTS tbl_atg_mqtt_setting (
+        id INTEGER PRIMARY KEY,
+        broker_host TEXT NOT NULL DEFAULT '',
+        broker_port INTEGER NOT NULL DEFAULT 1883,
+        username TEXT NOT NULL DEFAULT '',
+        password TEXT NOT NULL DEFAULT '',
+        topic_path TEXT NOT NULL DEFAULT 'maintank/atg/value',
+        publish_interval_sec INTEGER NOT NULL DEFAULT 30,
+        company_name TEXT NOT NULL DEFAULT 'PT. Putra Perkasa Abadi',
+        plant_id TEXT NOT NULL DEFAULT 'PPA-BA',
+        enabled INTEGER NOT NULL DEFAULT 1
+    )");
+
+    // Ensure one row exists in mqtt settings
+    try {
+        $stmt = $conn->query("SELECT COUNT(*) FROM tbl_atg_mqtt_setting");
+        $count = $stmt->fetchColumn();
+        if ($count == 0) {
+            $conn->exec("INSERT INTO tbl_atg_mqtt_setting (id) VALUES (1)");
+        }
+    } catch (PDOException $e) {
+        // ignore
     }
 
     // Clean up stray rows beyond 8-channel schema
