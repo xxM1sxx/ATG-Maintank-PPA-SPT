@@ -89,94 +89,177 @@ $display_count = count($points);
     <meta charset="UTF-8">
     <title>ATG Calibration - <?php echo htmlspecialchars($label); ?></title>
     <style>
-    body { font-family: sans-serif; margin: 24px; color: #444; }
-    .table-scroll { max-height: 70vh; overflow-y: auto; margin-top: 12px; border: 1px solid #ccc; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 6px 10px; }
-    th { background: #f5f5f5; position: sticky; top: 0; z-index: 1; }
-    input[type=text] { width: 90px; }
-    .msg { color: green; margin: 8px 0; }
-    .err { color: red; margin: 8px 0; }
-    .toolbar { margin: 16px 0; }
-    .toolbar form { display: inline-block; margin-right: 12px; }
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+    body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; color: #444; background: #f9f9f9; }
+
+    .header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 16px 32px; background: #f9f9f9; border-bottom: 1px solid #ddd;
+        margin-bottom: 24px;
+    }
+
+    h2 { margin: 0; color: #333; font-size: 20px; flex: 1; }
+
+    .back-link { color: #03a9f4; text-decoration: none; font-size: 14px; }
+    .back-link:hover { text-decoration: underline; }
+
+    .toolbar {
+        margin: 20px 32px; display: flex; gap: 16px; align-items: center;
+        flex-wrap: wrap; background: #fff; padding: 16px; border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .toolbar form { display: flex; gap: 8px; align-items: center; }
+    input[type=text], input[type=file], select {
+        padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    input[type=submit], .btn {
+        padding: 10px 20px; background: #03a9f4; color: white; text-decoration: none;
+        border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;
+        font-family: 'Poppins', sans-serif; transition: all 0.2s ease; display: inline-block;
+    }
+
+    input[type=submit]:hover, .btn:hover {
+        background: #0288d1; box-shadow: 0 2px 8px rgba(3, 169, 244, 0.3);
+    }
+
+    input[type=submit]:active { transform: translateY(1px); }
+
+    .toolbar a { padding: 10px 20px; background: #03a9f4; color: white; text-decoration: none;
+        border-radius: 4px; font-size: 14px; font-weight: 500; transition: all 0.2s ease; }
+    .toolbar a:hover { background: #0288d1; box-shadow: 0 2px 8px rgba(3, 169, 244, 0.3); }
+
+    .content { padding: 0 32px 32px; }
+    .info-text { color: #666; font-size: 14px; margin: 12px 0; }
+
+    .table-scroll { max-height: 70vh; overflow-y: auto; margin-top: 12px; border: 1px solid #ccc; border-radius: 4px; }
+    table { border-collapse: collapse; width: 100%; background: white; font-family: 'Poppins', sans-serif; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
+    th { background: #f5f5f5; position: sticky; top: 0; z-index: 1; font-weight: 600; color: #333; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    tr:hover { background-color: #f0f7ff; }
+
+    .table-scroll input[type=text] { width: 100px; }
+
+    .form-note { font-size: 13px; color: #666; margin: 12px 0; }
+
+    .form-actions { margin-top: 16px; display: flex; gap: 12px; align-items: center; }
+
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+    .toast { background: #333; color: #fff; padding: 12px 20px; border-radius: 4px; margin-bottom: 10px;
+             min-width: 250px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+    .toast.success { background: #28a745; }
+    .toast.error { background: #dc3545; }
+    @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
     </style>
+    <script>
+    function showToast(msg, type = 'info') {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+        let toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    window.addEventListener('load', function() {
+        let params = new URLSearchParams(window.location.search);
+        if (params.has('error')) {
+            showToast('❌ Error: ' + decodeURIComponent(params.get('error')), 'error');
+            window.history.replaceState({}, document.title, window.location.pathname + '?sensor=' + params.get('sensor'));
+        } else if (params.has('saved')) {
+            showToast('✓ Changes saved successfully.', 'success');
+            window.history.replaceState({}, document.title, window.location.pathname + '?sensor=' + params.get('sensor'));
+        } else if (params.has('imported')) {
+            showToast('✓ Imported ' + decodeURIComponent(params.get('imported')) + ' calibration points.', 'success');
+            window.history.replaceState({}, document.title, window.location.pathname + '?sensor=' + params.get('sensor'));
+        }
+    });
+    </script>
 </head>
 <body>
-    <p><a href="home.php">&larr; Back to Settings</a></p>
-    <h2>Calibration Table — <?php echo htmlspecialchars($label); ?> (Sensor <?php echo $sensor_id; ?>)</h2>
-    <?php if ($point_count > 0): ?>
-    <p>
-        Menampilkan <?php echo $display_count; ?> titik
-        <?php if ($filter_active): ?>
-            (filter mm <?php echo $range_from; ?>–<?php echo $range_to; ?> dari <?php echo $point_count; ?> total)
-        <?php else: ?>
-            (sounding <?php echo $min_sounding; ?> – <?php echo $max_sounding; ?> mm, <?php echo $point_count; ?> titik — sama dengan data seed)
-        <?php endif; ?>.
-        Offset (mm) di ATG Settings: Sounding = Probe + Offset. Volume lookup memakai Sounding.
-    </p>
-    <?php else: ?>
-    <p>Belum ada data kalibrasi. Import seed atau CSV terlebih dahulu.</p>
-    <?php endif; ?>
-
-    <?php if (isset($_GET['saved'])): ?><p class="msg">Saved.</p><?php endif; ?>
-    <?php if (isset($_GET['imported'])): ?><p class="msg">Imported <?php echo intval($_GET['imported']); ?> points.</p><?php endif; ?>
-    <?php if (isset($_GET['error'])): ?><p class="err">Error: <?php echo htmlspecialchars($_GET['error']); ?></p><?php endif; ?>
-
-    <div class="toolbar">
-        <form method="get">
-            Sensor:
-            <select name="sensor" onchange="this.form.submit()">
-                <?php for ($i = 1; $i <= 8; $i++): ?>
-                <option value="<?php echo $i; ?>" <?php echo ($i === $sensor_id) ? 'selected' : ''; ?>>TANKI-<?php echo $i; ?></option>
-                <?php endfor; ?>
-            </select>
-        </form>
-        <form method="get">
-            <input type="hidden" name="sensor" value="<?php echo $sensor_id; ?>">
-            Filter mm dari <input type="text" name="from" value="<?php echo $filter_active ? $range_from : ''; ?>" placeholder="<?php echo $min_sounding; ?>" size="6">
-            sampai <input type="text" name="to" value="<?php echo $filter_active ? $range_to : ''; ?>" placeholder="<?php echo $max_sounding; ?>" size="6">
-            <input type="submit" value="Filter">
-        </form>
-        <?php if ($filter_active): ?>
-        <a href="?sensor=<?php echo $sensor_id; ?>">Tampilkan semua</a>
-        <?php endif; ?>
-        <a href="?sensor=<?php echo $sensor_id; ?>&export=csv">Export CSV</a>
-        <form method="post" action="save_data.php" enctype="multipart/form-data" style="display:inline">
-            <input type="hidden" name="calibration_sensor_id" value="<?php echo $sensor_id; ?>">
-            <input type="file" name="calibration_csv" accept=".csv,text/csv">
-            <input type="submit" name="import_calibration_csv" value="Import CSV">
-        </form>
-        <form method="post" action="save_data.php" style="display:inline">
-            <input type="hidden" name="calibration_sensor_id" value="<?php echo $sensor_id; ?>">
-            <input type="submit" name="import_calibration_seed" value="Import default (PDF seed)">
-        </form>
+    <div class="header">
+        <h2>Calibration — <?php echo htmlspecialchars($label); ?> (Sensor <?php echo $sensor_id; ?>)</h2>
+        <a href="home.php" class="back-link">← Back to Settings</a>
     </div>
+    <div class="content">
+        <?php if ($point_count > 0): ?>
+        <p class="info-text">
+            Showing <?php echo $display_count; ?> calibration points
+            <?php if ($filter_active): ?>
+                (filtered <?php echo $range_from; ?>–<?php echo $range_to; ?> mm of <?php echo $point_count; ?> total)
+            <?php else: ?>
+                (range <?php echo $min_sounding; ?>–<?php echo $max_sounding; ?> mm)
+            <?php endif; ?>.
+        </p>
+        <?php else: ?>
+        <p class="info-text">No calibration data yet. Upload a CSV file to get started.</p>
+        <?php endif; ?>
 
-    <?php if ($point_count === 0): ?>
-        <p>No calibration data. Use <strong>Import default (PDF seed)</strong> or upload a CSV.</p>
-    <?php else: ?>
-        <form method="post" action="save_data.php">
-            <input type="hidden" name="calibration_sensor_id" value="<?php echo $sensor_id; ?>">
-            <div class="table-scroll">
-                <table>
-                    <tr><th>Sounding (mm)</th><th>Volume (L)</th></tr>
-                    <?php foreach ($points as $p): ?>
-                    <tr>
-                        <td>
-                            <input type="hidden" name="sounding_mm[]" value="<?php echo intval($p['sounding_mm']); ?>">
-                            <?php echo intval($p['sounding_mm']); ?>
-                        </td>
-                        <td><input type="text" name="volume_l[]" value="<?php echo floatval($p['volume_l']); ?>"></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </table>
-            </div>
-            <p><input type="submit" name="save_calibration_table" value="Save"></p>
-            <p><small>
-                Edit volume inline lalu Save, atau gunakan Export/Import CSV untuk perubahan massal.
-                Save penuh (~2600 baris) membutuhkan <code>max_input_vars &ge; 10000</code> di php.ini (lihat BUILD-BBB.md).
-            </small></p>
-        </form>
-    <?php endif; ?>
+        <div class="toolbar">
+            <form method="get">
+                <label style="margin: 0;">Sensor:</label>
+                <select name="sensor" onchange="this.form.submit()">
+                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                    <option value="<?php echo $i; ?>" <?php echo ($i === $sensor_id) ? 'selected' : ''; ?>>TANKI-<?php echo $i; ?></option>
+                    <?php endfor; ?>
+                </select>
+            </form>
+            <form method="get">
+                <input type="hidden" name="sensor" value="<?php echo $sensor_id; ?>">
+                <label style="margin: 0;">Filter:</label>
+                <input type="text" name="from" value="<?php echo $filter_active ? $range_from : ''; ?>" placeholder="from mm" size="8">
+                <input type="text" name="to" value="<?php echo $filter_active ? $range_to : ''; ?>" placeholder="to mm" size="8">
+                <input type="submit" value="Apply">
+            </form>
+            <?php if ($filter_active): ?>
+            <a href="?sensor=<?php echo $sensor_id; ?>">Clear filter</a>
+            <?php endif; ?>
+            <a href="?sensor=<?php echo $sensor_id; ?>&export=csv">Export CSV</a>
+            <form method="post" action="save_data.php" enctype="multipart/form-data">
+                <input type="hidden" name="calibration_sensor_id" value="<?php echo $sensor_id; ?>">
+                <input type="file" name="calibration_csv" accept=".csv,text/csv">
+                <input type="submit" name="import_calibration_csv" value="Import CSV">
+            </form>
+        </div>
+
+        <?php if ($point_count === 0): ?>
+            <p class="info-text">No calibration data. Please upload a CSV file to import calibration points.</p>
+        <?php else: ?>
+            <form method="post" action="save_data.php">
+                <input type="hidden" name="calibration_sensor_id" value="<?php echo $sensor_id; ?>">
+                <div class="table-scroll">
+                    <table>
+                        <tr><th>Sounding (mm)</th><th>Volume (L)</th></tr>
+                        <?php foreach ($points as $p): ?>
+                        <tr>
+                            <td>
+                                <input type="hidden" name="sounding_mm[]" value="<?php echo intval($p['sounding_mm']); ?>">
+                                <?php echo intval($p['sounding_mm']); ?>
+                            </td>
+                            <td><input type="text" name="volume_l[]" value="<?php echo floatval($p['volume_l']); ?>"></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </table>
+                </div>
+                <div class="form-actions">
+                    <input type="submit" name="save_calibration_table" value="Save Changes">
+                </div>
+                <p class="form-note">Edit volume inline then Save, or use Export/Import CSV for bulk changes.</p>
+            </form>
+        <?php endif; ?>
+    </div>
 </body>
 </html>

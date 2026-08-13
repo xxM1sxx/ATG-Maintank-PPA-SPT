@@ -23,13 +23,19 @@
     <meta charset="UTF-8">
     <title>Vimo Zetha</title>
     <style>
-    @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
     *,
     *:before,
     *:after {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
     body {
@@ -39,72 +45,114 @@
         color: #777777;
     }
 
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 32px;
+        background: #f9f9f9;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 24px;
+    }
+
     h1 {
         font-family: 'Poppins', sans-serif;
         font-size: 24px;
-        text-align: center;
-        line-height: 1.0;
-        color: #777777;
+        margin: 0;
+        color: #333;
+        flex: 1;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .welcome-text {
+        color: #666;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .logout-btn {
+        padding: 10px 20px;
+        background: #dc3545;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .logout-btn:hover {
+        background: #c82333;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
     }
 
     .container {
-        width: calc((100% - 200)/3);
+        width: 100%;
         margin: 0 auto;
-        max-width: 90%;
+        max-width: 1400px;
         padding-right: 16px;
         padding-left: 16px;
     }
 
     section {
         background: #ffffff;
-        padding: 100px 0;
+        padding: 32px 0;
     }
 
     .tab__list {
         display: flex;
         margin-bottom: 24px;
+        border-bottom: 2px solid #ddd;
+        background: transparent;
+        padding: 0;
     }
 
     .tab__item {
         overflow: hidden;
         cursor: pointer;
-        padding: 12px 8px;
-        margin-right: 24px;
-        text-shadow: 0 0 0.5px currentColor;
-        letter-spacing: 1px;
-        transition: 0.2s;
-        font-size: 18px;
+        padding: 16px 24px;
+        margin-right: 0;
+        text-shadow: none;
+        letter-spacing: 0;
+        transition: all 0.3s ease;
+        font-size: 15px;
+        font-weight: 500;
         position: relative;
-        color: #777777;
+        color: #666;
+        border-bottom: 3px solid transparent;
     }
 
     .tab__item:before {
-        content: "";
-        position: absolute;
-        top: 95%;
-        left: 0;
-        height: 2px;
-        width: 100%;
-        background: #03a9f4;
-        transition: 0.2s;
-        visibility: hidden;
-        opacity: 0;
+        display: none;
+    }
+
+    .tab__item:hover {
+        color: #333;
+        background: #f9f9f9;
     }
 
     .tab__item.is--active {
-        color: #444;
+        color: #03a9f4;
+        border-bottom-color: #03a9f4;
         position: relative;
     }
 
     .tab__item.is--active:before {
-        visibility: visible;
-        opacity: 1;
+        display: none;
     }
 
     .tab__content {
-        padding: 32px;
-        background: #f1f1f1;
-        border-radius: 0 10px 10px;
+        padding: 32px 0;
+        background: transparent;
     }
 
     .tab__content-item {
@@ -119,12 +167,26 @@
         padding: 24px 24px 24px 0;
     }
 
+    .tab .tab .tab__list {
+        border-bottom: 1px solid #ddd;
+        padding: 0;
+    }
+
     .tab .tab .tab__item {
-        font-size: 16px;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 12px 16px;
+        border-bottom: 2px solid transparent;
+    }
+
+    .tab .tab .tab__item.is--active {
+        border-bottom-color: #03a9f4;
     }
 
     .tab .tab .tab__content {
         padding: 0;
+        background: transparent;
+        box-shadow: none;
     }
 
     .logo_qims {
@@ -136,27 +198,212 @@
     }
 
     table {
-        font-family: arial, sans-serif;
+        font-family: 'Poppins', sans-serif;
         border-collapse: collapse;
         width: 100%;
+        background: white;
     }
 
-
-    td,
-    th {
-        border: 1px solid #dddddd;
+    td, th {
+        border: 1px solid #ddd;
         text-align: left;
-        padding: 8px;
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    th {
+        background: #f5f5f5;
+        font-weight: 600;
+        color: #333;
     }
 
     tr:nth-child(even) {
-        background-color: #dddddd;
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f0f7ff;
     }
 
     label {
         display: inline-block;
         width: 250px;
         text-align: left;
+    }
+
+    .form-section {
+        margin-bottom: 28px;
+    }
+
+    .form-section > strong,
+    .section-title {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 16px;
+        color: #333;
+    }
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+        gap: 20px;
+        align-items: stretch;
+    }
+
+    .settings-grid .form-section {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .settings-grid .form-section:not(.multi-form) form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .settings-grid .form-section:not(.multi-form) form > .form-group:has(input[type="submit"]):last-child {
+        margin-top: auto;
+        padding-top: 12px;
+    }
+
+    .settings-grid .form-section.multi-form form {
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .settings-grid .form-section.multi-form form:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .settings-subtitle {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 10px;
+    }
+
+    .checkbox-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding: 12px 14px;
+        background: #f9f9f9;
+        border: 1px solid #eee;
+        border-radius: 6px;
+    }
+
+    .checkbox-grid .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .form-actions {
+        margin-top: 16px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .form-group label {
+        margin: 0;
+        width: auto;
+        min-width: 200px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    input[type="date"],
+    input[type="time"],
+    input[type="file"],
+    select {
+        padding: 6px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-group label.checkbox-label,
+    .form-group label:has(input[type="checkbox"]) {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .form-group input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: #03a9f4;
+    }
+
+    input[type="submit"],
+    input[type="button"],
+    .btn {
+        padding: 10px 20px;
+        background: #03a9f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    input[type="submit"]:hover,
+    input[type="button"]:hover,
+    .btn:hover {
+        background: #0288d1;
+        box-shadow: 0 2px 8px rgba(3, 169, 244, 0.3);
+    }
+
+    input[type="submit"]:active,
+    input[type="button"]:active {
+        transform: translateY(1px);
+    }
+
+    input[type="submit"].btn-danger {
+        background: #dc3545;
+    }
+
+    input[type="submit"].btn-danger:hover {
+        background: #c82333;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    .form-note {
+        font-size: 12px;
+        color: #666;
+        margin-top: 4px;
     }
 
     .status-online {
@@ -192,7 +439,45 @@
     }
     var hasil = formatAMPM();
     document.cookie = "myJavascriptVar = " + hasil;
-    //document.location = 'save_data.php?realtime='+hasil;  
+    //document.location = 'save_data.php?realtime='+hasil;
+    </script>
+    <style>
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+    .toast { background: #333; color: #fff; padding: 12px 20px; border-radius: 4px; margin-bottom: 10px;
+             min-width: 250px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); animation: slideIn 0.3s ease; }
+    .toast.success { background: #28a745; }
+    .toast.error { background: #dc3545; }
+    @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+    </style>
+    <script>
+    function showToast(msg, type = 'info') {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+        let toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    window.addEventListener('load', function() {
+        let params = new URLSearchParams(window.location.search);
+        if (params.has('error')) {
+            showToast('❌ Error: ' + decodeURIComponent(params.get('error')), 'error');
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (params.has('saved')) {
+            showToast('✓ Changes saved successfully.', 'success');
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
     </script>
 </head>
 <?php
@@ -263,8 +548,8 @@
 		$data_comport1 = ($data_setting && isset($data_setting[7])) ? $data_setting[7] : ''; 
 		$data_comport2 = ($data_setting && isset($data_setting[8])) ? $data_setting[8] : ''; 
 		$data_comport_modbus  = ($data_setting && isset($data_setting[9])) ? $data_setting[9] : ''; 
-		$data_serial_number  = ($data_setting && isset($data_setting[10])) ? $data_setting[10] : ''; 
-		$data_logfile_day_rotation= ($data_setting && isset($data_setting[11])) ? $data_setting[11] : ''; 
+		$data_serial_number  = ($data_setting && isset($data_setting[10])) ? $data_setting[10] : '';
+		// skip index 11 (logfile_day_rotation - unused, removed feature)
 		// skip index 12 (version_firmware - tidak dipakai)
 		$data_unitname= ($data_setting && isset($data_setting[13])) ? $data_setting[13] : ''; 
 		$data_ip_address_logger_alias= ($data_setting && isset($data_setting[14])) ? $data_setting[14] : ''; 
@@ -380,28 +665,16 @@
 	?>
 
 <body>
-    <h1>ATG Maintank</h1>
-    <?php if (isset($_GET['saved'])):
-        $saved = $_GET['saved'];
-        if ($saved === 'ntp') {
-            $msg = '✓ Time synchronized with NTP successfully!';
-        } elseif ($saved === 'datetime') {
-            $msg = '✓ Date and time updated successfully!';
-        } else {
-            $msg = '✓ Settings saved successfully!';
-        }
-    ?>
-    <p style="color: green; text-align: center;"><?php echo $msg; ?></p>
-    <?php elseif (isset($_GET['error'])): ?>
-    <p style="color: red; text-align: center;">❌ Error: <?php echo htmlspecialchars($_GET['error'] ?? 'Save failed'); ?></p>
-    <?php endif; ?>
-    <span style="float:right;">
-        <h2>Welcome, <?php echo $_SESSION['username']; ?></h2>
-        <h2><a href="action-logout.php">Logout</a></h2>
-    </span>
+    <div class="header">
+        <h1>ATG Maintank</h1>
+        <div class="header-right">
+            <p class="welcome-text">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></p>
+            <a href="action-logout.php" class="logout-btn">Logout</a>
+        </div>
+    </div>
     <section class="section">
         <div class="container">
-            <div class="tab">
+            <div class="tab" id="tab-main">
                 <div class="tab__list">
                     <div class="tab__item">
                         Status
@@ -411,15 +684,17 @@
                     </div>
                 </div>
                 <div class="tab__content">
-                    <div class="tab__content-item tab">
+                    <div class="tab__content-item tab" id="tab-status">
                         <div class="tab__list">
                             <div class="tab__item">
                                 General
                             </div>
 
+                            <!-- Download tab unused, kept for reference
                             <div class="tab__item">
                                 Download
                             </div>
+                            -->
                             <div class="tab__item">
                                 Fuel Level
                             </div>
@@ -465,6 +740,10 @@
                                         <td><?php echo $get_uptime;?></td>
                                     </tr>
                                     <tr>
+                                        <td>Date &amp; Time</td>
+                                        <td id="live_datetime" data-server-time="<?php echo trim(shell_exec('date +"%Y-%m-%d %H:%M:%S"')); ?>"><?php echo trim(shell_exec('date +"%d %b %Y %H:%M:%S"')); ?></td>
+                                    </tr>
+                                    <tr>
 										<td>PSS Status</td>
 										<td id="pss_status" style="vertical-align: middle;">Checking...</td>
 									</tr>
@@ -508,15 +787,17 @@
                                 </table>
                             </div>
 
+                            <!-- Download Files tab unused, kept for reference
                             <div class="tab__content-item">
-                                <strong>Download Files</strong><br>
+                                <strong class="section-title">Download Files</strong>
                                 <iframe src="file_manager.php" id="iFrame1" width="900" height="500">
                                 </iframe>
 
                             </div>
+                            -->
 
                             <div class="tab__content-item">
-                                <strong>Fuel Level Sensors</strong><br><br>
+                                <strong class="section-title">Fuel Level Sensors</strong>
                                 <table id="atg_readings_table">
                                     <tr>
                                         <th>#</th>
@@ -550,7 +831,7 @@
                             </div>
 
                             <div class="tab__content-item">
-                                <strong>Serial Information</strong><br><br>
+                                <strong class="section-title">Serial Information</strong>
                                 <table>
                                     <tr>
                                         <td>Serial Port Radio</td>
@@ -574,7 +855,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab__content-item tab">
+                    <div class="tab__content-item tab" id="tab-settings">
                         <div class="tab__list">
                             <div class="tab__item">
                                 General
@@ -617,153 +898,77 @@
                         </div>
                         <div class="tab__content">
                             <div class="tab__content-item">
-                                <form method="post" action="save_data.php">
-                                    <label for="unit_name"><strong>Unit Name </strong></label>
-                                    <input type="text" id="data_unitname" name="data_unitname"
-                                        value="<?php echo $data_unitname;?>"><br>
-
-
-
-                                    <strong>Ethernet Properties</strong><br>
-                                    <label for="data_ip_address_logger">IP Address</label>
-                                    <input type="text" id="data_ip_address_logger" name="data_ip_address_logger"
-                                        value="<?php echo $data_ip_address_logger;?>"><br>
-
-                                    <label for="data_subnetmask_logger">Subnetmask</label>
-                                    <input type="text" id="data_subnetmask_logger" name="data_subnetmask_logger"
-                                        value="<?php echo $data_subnetmask_logger;?>"><br>
-
-                                    <label for="data_gateway_logger">Gateway</label>
-                                    <input type="text" id="data_gateway_logger" name="data_gateway_logger"
-                                        value="<?php echo $data_gateway_logger;?>">
-                                    <br><br>
-
-                                    <br>
-                                    <!-- <label for="data_comport1">Serial Com : </label>										
-									<select name="data_comport1" id="data_comport1" >
-										<option value="1" <?php if($data_comport1=="1") echo 'selected="selected"'; ?> >1</option>
-										<option value="2" <?php if($data_comport1=="2") echo 'selected="selected"'; ?> >2</option>
-										<option value="3" <?php if($data_comport1=="3") echo 'selected="selected"'; ?> >3</option>
-										<option value="4" <?php if($data_comport1=="4") echo 'selected="selected"'; ?> >4</option>
-									</select>
-								<br>
-								<label for="data_baudrate1">Baudrate : </label>	
-									<select name="data_baudrate1" id="data_baudrate1" >
-										<option value="9600" <?php if($data_baudrate1=="9600") echo 'selected="selected"'; ?> >9600</option>
-										<option value="19200" <?php if($data_baudrate1=="19200") echo 'selected="selected"'; ?> >19200</option>
-										<option value="57600" <?php if($data_baudrate1=="57600") echo 'selected="selected"'; ?> >57600</option>
-										<option value="115200" <?php if($data_baudrate1=="115200") echo 'selected="selected"'; ?> >115200</option>
-									</select>
-								<br><br> -->
-                                    <!-- <label for="SETTING_tyreINTERVALREGID">Interval Request ID</label>
-                                    <input type="text" id="SETTING_tyreINTERVALREGID" name="SETTING_tyreINTERVALREGID"
-                                        value="<?php echo $SETTING_tyreINTERVALREGID;?>"> [detik]
-                                    <br> -->
-
-
-                                    <!-- <label for="SETTING_tyreSATUANTEKANAN">Satuan Tekanan : </label>
-                                    <select name="SETTING_tyreSATUANTEKANAN" id="SETTING_tyreSATUANTEKANAN">
-                                        <option value="0"
-                                            <?php if($SETTING_tyreSATUANTEKANAN=="0") echo 'selected="selected"'; ?>>PSI
-                                        </option>
-                                        <option value="1"
-                                            <?php if($SETTING_tyreSATUANTEKANAN=="1") echo 'selected="selected"'; ?>>BAR
-                                        </option>
-                                    </select> -->
-                                    <br><br>
-                                    <!-- <label for="SETTING_radiusLoading">Radius Loading</label>
-                                    <input type="text" id="SETTING_radiusLoading" name="SETTING_radiusLoading"
-                                        value="<?php echo $SETTING_radiusLoading;?>"> [m]
-                                    <br>
-                                    <label for="SETTING_radiusWaiting">Radius Waiting</label>
-                                    <input type="text" id="SETTING_radiusWaiting" name="SETTING_radiusWaiting"
-                                        value="<?php echo $SETTING_radiusWaiting;?>"> [m]
-                                    <br>
-                                    <label for="SETTING_radiusHauling">Radius Hauling</label>
-                                    <input type="text" id="SETTING_radiusHauling" name="SETTING_radiusHauling"
-                                        value="<?php echo $SETTING_radiusHauling;?>"> [m]
-                                    <br>
-                                    <label for="SETTING_company">Company</label>
-                                    <input type="text" id="SETTING_company" name="SETTING_company"
-                                        value="<?php echo $SETTING_company;?>">
-                                    <br>
-                                    <label for="SETTING_plant">Plant</label>
-                                    <input type="text" id="SETTING_plant" name="SETTING_plant"
-                                        value="<?php echo $SETTING_plant;?>">
-                                    <br>
-                                    <label for="SETTING_plant_description">Plant Description</label>
-                                    <input type="text" id="SETTING_plant_description" name="SETTING_plant_description"
-                                        value="<?php echo $SETTING_plant_description;?>">
-                                    <br>
-                                    <br><br>
-                                    <label for="SETTING_tyrePUSHHTTPPOST">Interval Push Http Post</label>
-                                    <input type="text" id="SETTING_tyreINSETTING_tyrePUSHHTTPPOSTTERVALSAVELOG"
-                                        name="SETTING_tyrePUSHHTTPPOST" value="<?php echo $SETTING_tyrePUSHHTTPPOST;?>">
-                                    [detik] -->
-                                    <!-- <br>
-                                    <label for="SETTING_tyrePUSHMQTT">Interval Push MQTT</label>
-                                    <input type="text" id="SETTING_tyrePUSHMQTT" name="SETTING_tyrePUSHMQTT"
-                                        value="<?php echo $SETTING_tyrePUSHMQTT;?>"> [detik]
-                                    <br> -->
-                                    <br>
-                                    <!-- <label for="SETTING_tyreURLAPI">URL API</label>
-                                    <input type="text" id="SETTING_tyreURLAPI" name="SETTING_tyreURLAPI"
-                                        value="<?php echo $SETTING_tyreURLAPI;?>">
-                                    <br>
-
-                                    <label for="SETTING_tyreIDSITE">ID SITE</label>
-                                    <input type="text" id="SETTING_tyreIDSITE" name="SETTING_tyreIDSITE"
-                                        value="<?php echo $SETTING_tyreIDSITE;?>">
-                                    <br> -->
-
-                                    <input type="submit" name="save_general_settings" onclick="save_data.php"
-                                        value=" Save Changes "><br><br><br>
-                                </form>
+                                <div class="form-section">
+                                    <strong>Unit Identity &amp; Ethernet Properties</strong>
+                                    <form method="post" action="save_data.php">
+                                        <div class="form-group">
+                                            <label for="data_unitname">Unit Name:</label>
+                                            <input type="text" id="data_unitname" name="data_unitname"
+                                                value="<?php echo htmlspecialchars($data_unitname);?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="data_ip_address_logger">IP Address:</label>
+                                            <input type="text" id="data_ip_address_logger" name="data_ip_address_logger"
+                                                value="<?php echo htmlspecialchars($data_ip_address_logger);?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="data_subnetmask_logger">Subnetmask:</label>
+                                            <input type="text" id="data_subnetmask_logger" name="data_subnetmask_logger"
+                                                value="<?php echo htmlspecialchars($data_subnetmask_logger);?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="data_gateway_logger">Gateway:</label>
+                                            <input type="text" id="data_gateway_logger" name="data_gateway_logger"
+                                                value="<?php echo htmlspecialchars($data_gateway_logger);?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="save_general_settings" value="Save Changes">
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                            
+
 
                             <div class="tab__content-item">
+                                <div class="settings-grid">
 
-                                <Strong>Schedule Rotation</strong><br>
-                                <form method="post" action="save_data.php">
-                                    <label for="data_logfile_day_rotation">Months : </label>
-                                    <input type="text" id="data_logfile_day_rotation" name="data_logfile_day_rotation"
-                                        value="<?php echo $data_logfile_day_rotation;?>">
-                                    <input type="submit" name="save_rotation_settings" onclick="save_data.php"
-                                        value=" Save Changes ">
-                                </form><br>
+                                <div class="form-section">
+                                    <strong>Syslog Rotation</strong>
+                                    <form method="post" action="save_data.php">
+                                        <div class="form-group">
+                                            <label for="data_syslog_rotate_count">Rotate Count:</label>
+                                            <input type="text" id="data_syslog_rotate_count" name="data_syslog_rotate_count"
+                                                value="<?php echo $data_syslog_rotate_count; ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="data_syslog_rotate_frequency">Frequency:</label>
+                                            <select id="data_syslog_rotate_frequency" name="data_syslog_rotate_frequency">
+                                                <option value="daily" <?php echo ($data_syslog_rotate_frequency === 'daily') ? 'selected' : ''; ?>>daily</option>
+                                                <option value="weekly" <?php echo ($data_syslog_rotate_frequency === 'weekly') ? 'selected' : ''; ?>>weekly</option>
+                                                <option value="monthly" <?php echo ($data_syslog_rotate_frequency === 'monthly') ? 'selected' : ''; ?>>monthly</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="data_syslog_max_size">Max Size:</label>
+                                            <input type="text" id="data_syslog_max_size" name="data_syslog_max_size"
+                                                value="<?php echo htmlspecialchars($data_syslog_max_size); ?>">
+                                        </div>
+                                        <div class="checkbox-grid">
+                                            <label class="checkbox-label"><input type="checkbox" name="data_syslog_compress" value="1"
+                                                <?php echo ($data_syslog_compress === 1) ? 'checked' : ''; ?>> Compress</label>
+                                            <label class="checkbox-label"><input type="checkbox" name="data_syslog_delaycompress" value="1"
+                                                <?php echo ($data_syslog_delaycompress === 1) ? 'checked' : ''; ?>> Delay Compress</label>
+                                            <label class="checkbox-label"><input type="checkbox" name="data_syslog_missingok" value="1"
+                                                <?php echo ($data_syslog_missingok === 1) ? 'checked' : ''; ?>> Missing OK</label>
+                                            <label class="checkbox-label"><input type="checkbox" name="data_syslog_notifempty" value="1"
+                                                <?php echo ($data_syslog_notifempty === 1) ? 'checked' : ''; ?>> Not If Empty</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="save_syslog_settings" value="Save Syslog Setting">
+                                        </div>
+                                    </form>
+                                </div>
 
-                                <strong>Syslog Rotation</strong><br>
-                                <form method="post" action="save_data.php">
-                                    <label for="data_syslog_rotate_count">Rotate Count </label>
-                                    <input type="text" id="data_syslog_rotate_count" name="data_syslog_rotate_count"
-                                        value="<?php echo $data_syslog_rotate_count; ?>"><br>
-                                    <label for="data_syslog_rotate_frequency">Frequency </label>
-                                    <select id="data_syslog_rotate_frequency" name="data_syslog_rotate_frequency">
-                                        <option value="daily" <?php echo ($data_syslog_rotate_frequency === 'daily') ? 'selected' : ''; ?>>daily</option>
-                                        <option value="weekly" <?php echo ($data_syslog_rotate_frequency === 'weekly') ? 'selected' : ''; ?>>weekly</option>
-                                        <option value="monthly" <?php echo ($data_syslog_rotate_frequency === 'monthly') ? 'selected' : ''; ?>>monthly</option>
-                                    </select><br>
-                                    <label for="data_syslog_max_size">Max Size</label>
-                                    <input type="text" id="data_syslog_max_size" name="data_syslog_max_size"
-                                        value="<?php echo htmlspecialchars($data_syslog_max_size); ?>"><br>
-                                    <small>Contoh: 100M, 500k, kosongkan jika tidak dipakai</small><br>
-                                    <label><input type="checkbox" name="data_syslog_compress" value="1"
-                                        <?php echo ($data_syslog_compress === 1) ? 'checked' : ''; ?>> Compress</label><br>
-                                    <label><input type="checkbox" name="data_syslog_delaycompress" value="1"
-                                        <?php echo ($data_syslog_delaycompress === 1) ? 'checked' : ''; ?>> Delay Compress</label><br>
-                                    <label><input type="checkbox" name="data_syslog_missingok" value="1"
-                                        <?php echo ($data_syslog_missingok === 1) ? 'checked' : ''; ?>> Missing OK</label><br>
-                                    <label><input type="checkbox" name="data_syslog_notifempty" value="1"
-                                        <?php echo ($data_syslog_notifempty === 1) ? 'checked' : ''; ?>> Not If Empty</label><br>
-                                    <input type="submit" name="save_syslog_settings" value=" Save Syslog Setting ">
-                                </form><br>
-
-                                <Strong>Synchronize</strong><br>
-                                <form method="post">
-                                    <label for="synctime">Synchronize with PC Time </label>
-                                    <input type="submit" name="sync" value=" Synchronize Time "><br>
-                                </form><br>
                                 <?php
 									if (isset($_POST['sync']))
 									{
@@ -775,50 +980,75 @@
 									}
 								?>
 
-                                <strong>Time Settings Manual</strong><br>
-                                <form method="post" action="save_data.php">
-                                    <label for="current_date">Set Current Date </label>
-                                    <input type="date" id="current_date" name="current_date"
-                                        value="<?php echo trim(shell_exec('date +"%Y-%m-%d"')); ?>"><br>
-                                    <label for="current_time">Set Current Time </label>
-                                    <input type="time" id="current_time" name="current_time"
-                                        value="<?php echo trim(shell_exec('date +"%H:%M"')); ?>"><br />
-                                    <label for="data_timezone">Set Timezone (GMT +) </label>
-                                    <input type="text" id="data_timezone" name="data_timezone"
-                                        value=<?php echo $data_timezone;?>>
-                                    <input type="submit" name="set_date_time" value=" Set Date Time "><br><br>
-                                </form>
+                                <div class="form-section multi-form">
+                                    <strong>Time Settings</strong>
 
-                                <strong>Synchronize Time with NTP</strong><br>
-                                <form method="post" action="save_data.php">
-                                    <label for="ntp_server">NTP Server</label>
-                                    <input type="text" id="ntp_server" name="ntp_server"
-                                        value="<?php echo htmlspecialchars($data_ip_address_ntp ?? 'pool.ntp.org'); ?>"
-                                        placeholder="pool.ntp.org"><br>
+                                    <form method="post" action="save_data.php">
+                                        <span class="settings-subtitle">Manual</span>
+                                        <div class="form-group">
+                                            <label for="data_timezone">Timezone (GMT):</label>
+                                            <input type="text" id="data_timezone" name="data_timezone"
+                                                value="<?php echo htmlspecialchars($data_timezone); ?>" placeholder="7">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="current_date">Set Current Date:</label>
+                                            <input type="date" id="current_date" name="current_date"
+                                                value="<?php echo trim(shell_exec('date +"%Y-%m-%d"')); ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="current_time">Set Current Time:</label>
+                                            <input type="time" id="current_time" name="current_time"
+                                                value="<?php echo trim(shell_exec('date +"%H:%M"')); ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="set_date_time" value="Set Date &amp; Time">
+                                        </div>
+                                    </form>
 
-                                    <label for="timezone_offset">Timezone (GMT Offset, e.g., +7 for WIB)</label>
-                                    <input type="text" id="timezone_offset" name="timezone_offset"
-                                        value="<?php echo htmlspecialchars($data_timezone ?? '+7'); ?>"
-                                        placeholder="+7" size="5"><br>
+                                    <form method="post">
+                                        <span class="settings-subtitle">Sync with PC</span>
+                                        <div class="form-group">
+                                            <input type="submit" name="sync" value="Synchronize with PC Time">
+                                        </div>
+                                    </form>
 
-                                    <input type="submit" name="sync_ntp" value=" Sync Time with NTP "><br><br>
-                                </form>
+                                    <form method="post" action="save_data.php">
+                                        <span class="settings-subtitle">Sync with NTP</span>
+                                        <input type="hidden" name="timezone_offset" value="<?php echo htmlspecialchars($data_timezone ?? '7'); ?>">
+                                        <div class="form-group">
+                                            <label for="ntp_server">NTP Server:</label>
+                                            <input type="text" id="ntp_server" name="ntp_server"
+                                                value="<?php echo htmlspecialchars($data_ip_address_ntp ?? 'pool.ntp.org'); ?>"
+                                                placeholder="pool.ntp.org">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="sync_ntp" value="Sync Time with NTP">
+                                        </div>
+                                    </form>
+                                </div>
 
-                                <strong>Schedule Reboot</strong><br>
-                                <form method="post" action="save_data.php">
-                                    <label for="data_reboot_schedule_enable">Enable Schedule </label>
-                                    <input type="checkbox" id="data_reboot_schedule_enable" name="data_reboot_schedule_enable" value="1"
-                                        <?php echo ($data_reboot_schedule_enable == 1) ? 'checked' : ''; ?>><br>
-                                    <label for="data_reboot_time">Reboot Time </label>
-                                    <input type="time" id="data_reboot_time" name="data_reboot_time"
-                                        value="<?php echo htmlspecialchars($data_reboot_time ? $data_reboot_time : '03:00'); ?>"><br>
-                                    <input type="submit" name="save_reboot_schedule" value=" Save Schedule "><br><br>
-                                </form>
-
-                                <form method="post">
-                                    <label for="Reboot">Reboot </label>
-                                    <input type="submit" name="reboot" value="Reboot"><br>
-                                </form>
+                                <div class="form-section multi-form">
+                                    <strong>Schedule Reboot</strong>
+                                    <form method="post" action="save_data.php">
+                                        <div class="form-group">
+                                            <label class="checkbox-label"><input type="checkbox" id="data_reboot_schedule_enable" name="data_reboot_schedule_enable" value="1"
+                                                <?php echo ($data_reboot_schedule_enable == 1) ? 'checked' : ''; ?>> Enable Schedule</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="data_reboot_time">Reboot Time:</label>
+                                            <input type="time" id="data_reboot_time" name="data_reboot_time"
+                                                value="<?php echo htmlspecialchars($data_reboot_time ? $data_reboot_time : '03:00'); ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="save_reboot_schedule" value="Save Schedule">
+                                        </div>
+                                    </form>
+                                    <form method="post">
+                                        <div class="form-group">
+                                            <input type="submit" name="reboot" value="Reboot Now" class="btn-danger">
+                                        </div>
+                                    </form>
+                                </div>
                                 <?php
 									if (isset($_POST['reboot']))
 									{
@@ -826,14 +1056,17 @@
 										echo 'alert("Logger Akan melakukan Reboot Hardware.")';
 										echo '</script>';
 
-										shell_exec("echo 1234 | sudo -S reboot");	
+										shell_exec("echo 1234 | sudo -S reboot");
 										header('refresh:5;url=index.php');
 									}
 								?>
+
+                                </div>
                             </div>
 
                             <div class="tab__content-item">
-                                <strong>ATG Sensor Configuration</strong> (8 channels)<br><br>
+                                <div class="form-section">
+                                <strong>ATG Sensor Configuration</strong>
                                 <form method="post" action="save_data.php">
                                     <table>
                                         <tr>
@@ -882,44 +1115,59 @@
                                         </tr>
                                         <?php endfor; ?>
                                     </table>
-                                    <p><small>Sounding = Probe + Offset. Volume dihitung dari Sounding (mm).</small></p>
-                                    <br>
-                                    <input type="submit" name="save_atg_sensors" value=" Save ATG Settings ">
+                                    <div class="form-actions">
+                                        <input type="submit" name="save_atg_sensors" value="Save ATG Settings">
+                                    </div>
                                 </form>
-                            </div>
-                                                        <div class="tab__content-item">
-                                <strong>MQTT Settings</strong><br><br>
-                                <form method="post" action="save_data.php">
-                                    <label for="mqtt_broker_host">Broker Host (required)</label>
-                                    <input type="text" id="mqtt_broker_host" name="mqtt_broker_host" value="<?php echo htmlspecialchars($data_mqtt_broker_host); ?>" required><br>
-
-                                    <label for="mqtt_broker_port">Broker Port</label>
-                                    <input type="number" id="mqtt_broker_port" name="mqtt_broker_port" value="<?php echo $data_mqtt_broker_port; ?>" min="1" max="65535"><br>
-
-                                    <label for="mqtt_username">Username (required)</label>
-                                    <input type="text" id="mqtt_username" name="mqtt_username" value="<?php echo htmlspecialchars($data_mqtt_username); ?>" required><br>
-
-                                    <label for="mqtt_password">Password (required)</label>
-                                    <input type="password" id="mqtt_password" name="mqtt_password" value="<?php echo htmlspecialchars($data_mqtt_password); ?>" required><br>
-
-                                    <label for="mqtt_topic_path">Topic Path</label>
-                                    <input type="text" id="mqtt_topic_path" name="mqtt_topic_path" value="<?php echo htmlspecialchars($data_mqtt_topic_path); ?>" required><br>
-
-                                    <label for="mqtt_interval">Publish Interval (seconds)</label>
-                                    <input type="number" id="mqtt_interval" name="mqtt_interval" value="<?php echo $data_mqtt_interval; ?>" min="1" max="300"><br>
-
-                                    <label for="mqtt_company">Company Name</label>
-                                    <input type="text" id="mqtt_company" name="mqtt_company" value="<?php echo htmlspecialchars($data_mqtt_company); ?>"><br>
-
-                                    <label for="mqtt_plant_id">Plant ID</label>
-                                    <input type="text" id="mqtt_plant_id" name="mqtt_plant_id" value="<?php echo htmlspecialchars($data_mqtt_plant_id); ?>"><br><br>
-
-                                    <input type="submit" name="save_mqtt_settings" value=" Save MQTT Settings ">
-                                </form>
+                                </div>
                             </div>
 
                             <div class="tab__content-item">
-                                <strong>ATG Sensor Metadata (for MQTT)</strong><br><br>
+                                <div class="form-section">
+                                    <strong>MQTT Settings</strong>
+                                    <form method="post" action="save_data.php">
+                                        <div class="form-group">
+                                            <label for="mqtt_broker_host">Broker Host (required):</label>
+                                            <input type="text" id="mqtt_broker_host" name="mqtt_broker_host" value="<?php echo htmlspecialchars($data_mqtt_broker_host); ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="mqtt_broker_port">Broker Port:</label>
+                                            <input type="number" id="mqtt_broker_port" name="mqtt_broker_port" value="<?php echo $data_mqtt_broker_port; ?>" min="1" max="65535">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="mqtt_username">Username (required):</label>
+                                            <input type="text" id="mqtt_username" name="mqtt_username" value="<?php echo htmlspecialchars($data_mqtt_username); ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="mqtt_password">Password (required):</label>
+                                            <input type="password" id="mqtt_password" name="mqtt_password" value="<?php echo htmlspecialchars($data_mqtt_password); ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="mqtt_topic_path">Topic Path:</label>
+                                            <input type="text" id="mqtt_topic_path" name="mqtt_topic_path" value="<?php echo htmlspecialchars($data_mqtt_topic_path); ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="mqtt_interval">Publish Interval (s):</label>
+                                            <input type="number" id="mqtt_interval" name="mqtt_interval" value="<?php echo $data_mqtt_interval; ?>" min="1" max="300">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="mqtt_company">Company Name:</label>
+                                            <input type="text" id="mqtt_company" name="mqtt_company" value="<?php echo htmlspecialchars($data_mqtt_company); ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="mqtt_plant_id">Plant ID:</label>
+                                            <input type="text" id="mqtt_plant_id" name="mqtt_plant_id" value="<?php echo htmlspecialchars($data_mqtt_plant_id); ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="save_mqtt_settings" value="Save MQTT Settings">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="tab__content-item">
+                                <div class="form-section">
+                                <strong>ATG Sensor Metadata (for MQTT)</strong>
                                 <form method="post" action="save_data.php">
                                     <table>
                                         <tr>
@@ -942,9 +1190,11 @@
                                         </tr>
                                         <?php endfor; ?>
                                     </table>
-                                    <br>
-                                    <input type="submit" name="save_sensor_metadata" value=" Save Sensor Metadata ">
+                                    <div class="form-actions">
+                                        <input type="submit" name="save_sensor_metadata" value="Save Sensor Metadata">
+                                    </div>
                                 </form>
+                                </div>
                             </div>
 
                             <!-- pss-->
@@ -966,30 +1216,42 @@
 							?>
 
                             <div class="tab__content-item">
+                                <div class="form-section">
 								<?php if (!$show_pss_form): ?>
+                                    <strong>Protected Settings</strong>
 									<form method="post">
-										<p><strong>This setting is protected. Please insert password.</strong></p><br>
 										<?php if ($wrong_password): ?>
-											<p style="color:red;">Incorrect password. Please try again.</p>
+                                            <p class="form-note" style="color:#dc3545;">Incorrect password. Please try again.</p>
 										<?php endif; ?>
-										<label for="pss_password">Password:</label>
-										<input type="password" id="pss_password" name="pss_password" required>
-										<input type="submit" name="check_pss_password" value="Submit">
+                                        <div class="form-group">
+                                            <label for="pss_password">Password:</label>
+                                            <input type="password" id="pss_password" name="pss_password" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="check_pss_password" value="Submit">
+                                        </div>
 									</form>
 								<?php else: ?>
+                                    <strong>PSS Settings</strong>
 									<form method="post" action="save_data.php" onsubmit="return validatePSSForm();">
-										<label for="pss_mqtt_host">MQTT Host</label>
-										<input type="text" id="pss_mqtt_host" name="pss_mqtt_host" value="<?php echo $pss_mqtt_host; ?>"><br>
-
-										<label for="tenant">Tenant</label>
-										<input type="text" id="tenant" name="tenant" value="<?php echo $pss_tenant; ?>"><br>
-
-										<label for="sub_tenant">Sub Tenant</label>
-										<input type="text" id="sub_tenant" name="sub_tenant" value="<?php echo $pss_sub_tenant; ?>"><br><br><br>
-
-										<input type="submit" name="save_pss_setting" value="Save Changes"><br><br><br>
+                                        <div class="form-group">
+                                            <label for="pss_mqtt_host">MQTT Host:</label>
+                                            <input type="text" id="pss_mqtt_host" name="pss_mqtt_host" value="<?php echo htmlspecialchars($pss_mqtt_host); ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="tenant">Tenant:</label>
+                                            <input type="text" id="tenant" name="tenant" value="<?php echo htmlspecialchars($pss_tenant); ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sub_tenant">Sub Tenant:</label>
+                                            <input type="text" id="sub_tenant" name="sub_tenant" value="<?php echo htmlspecialchars($pss_sub_tenant); ?>">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="save_pss_setting" value="Save Changes">
+                                        </div>
 									</form>
 								<?php endif; ?>
+                                </div>
 							</div>
 
 
@@ -1117,20 +1379,25 @@
 
     const tabs = document.querySelectorAll(".tab");
 
-    function tabify(tab) {
+    function tabify(tab, tabKey) {
         const tabList = tab.querySelector(".tab__list");
 
         if (tabList) {
             const tabItems = [...tabList.children];
             const tabContent = tab.querySelector(".tab__content");
             const tabContentItems = [...tabContent.children];
+            const storageKey = tabKey ? "tabState_" + tabKey : null;
             let tabIndex = 0;
 
-            tabIndex = tabItems.findIndex((item, index) => {
-                return [...item.classList].indexOf("is--active") > -1;
-            });
-
-            tabIndex > -1 ? tabIndex = tabIndex : tabIndex = 0;
+            const savedIndex = storageKey ? parseInt(localStorage.getItem(storageKey), 10) : NaN;
+            if (!isNaN(savedIndex) && savedIndex >= 0 && savedIndex < tabItems.length) {
+                tabIndex = savedIndex;
+            } else {
+                tabIndex = tabItems.findIndex((item, index) => {
+                    return [...item.classList].indexOf("is--active") > -1;
+                });
+                tabIndex > -1 ? tabIndex = tabIndex : tabIndex = 0;
+            }
 
             function setTab(index) {
                 tabItems.forEach((x, index) => x.classList.remove("is--active"));
@@ -1138,18 +1405,46 @@
 
                 tabItems[index].classList.add("is--active");
                 tabContentItems[index].classList.add("is--active");
+
+                if (storageKey) {
+                    localStorage.setItem(storageKey, index);
+                }
             }
 
             tabItems.forEach((x, index) =>
                 x.addEventListener("click", () => setTab(index)));
 
             setTab(tabIndex);
-            tab.querySelectorAll(".tab").forEach(tabContent => tabify(tabContent));
         }
     }
 
-    tabs.forEach(tabify);
+    tabs.forEach(tab => tabify(tab, tab.id || null));
     //# sourceURL=pen.js
+    </script>
+    <script>
+    (function() {
+        const el = document.getElementById('live_datetime');
+        if (!el) return;
+
+        const parts = el.dataset.serverTime.match(/(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/);
+        if (!parts) return;
+
+        let serverEpochMs = Date.UTC(+parts[1], +parts[2] - 1, +parts[3], +parts[4], +parts[5], +parts[6]);
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        function pad(n) { return n.toString().padStart(2, '0'); }
+
+        function render() {
+            const d = new Date(serverEpochMs);
+            el.textContent = pad(d.getUTCDate()) + ' ' + months[d.getUTCMonth()] + ' ' + d.getUTCFullYear() + ' ' +
+                pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds());
+        }
+
+        setInterval(() => {
+            serverEpochMs += 1000;
+            render();
+        }, 1000);
+    })();
     </script>
 
     <script>

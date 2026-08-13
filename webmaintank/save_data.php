@@ -69,20 +69,6 @@ if (isset($_POST['save_general_settings'])) {
 	}
 }
 
-if (isset($_POST['save_rotation_settings'])) {
-	try {
-		$data_logfile_day_rotation = $_POST['data_logfile_day_rotation'];
-		$query = "UPDATE logger_settings SET logfile_day_rotation = :data_logfile_day_rotation";
-		$stmt = $conn->prepare($query);
-		$stmt->bindParam(':data_logfile_day_rotation', $data_logfile_day_rotation);
-		$stmt->execute();
-		save_redirect('saved=rotation');
-	} catch (Exception $e) {
-		error_log('save_rotation_settings: ' . $e->getMessage());
-		save_redirect('error=1');
-	}
-}
-
 if (isset($_POST['save_syslog_settings'])) {
 	try {
 		$data_syslog_rotate_count = max(1, intval($_POST['data_syslog_rotate_count']));
@@ -331,18 +317,24 @@ if (isset($_POST['set_date_time'])) {
 if (isset($_POST['sync_ntp'])) {
 	try {
 		$ntp_server = $_POST['ntp_server'] ?? 'pool.ntp.org';
-		$timezone_offset = $_POST['timezone_offset'] ?? '+7';
+		$timezone_input = trim($_POST['timezone_offset'] ?? '7');
 
-		// Validate timezone format (e.g., +7, -5, +5:30)
-		if (!preg_match('/^[+-]\d{1,2}(:\d{2})?$/', $timezone_offset)) {
-			throw new Exception('Invalid timezone format. Use +7, -5, +5:30, etc.');
+		// Validate timezone format (user can input: 7, -5, +7, 5:30, etc.)
+		if (!preg_match('/^[+-]?\d{1,2}(:\d{2})?$/', $timezone_input)) {
+			throw new Exception('Invalid timezone format. Use 7, -5, 5:30, etc.');
 		}
 
-		// Save timezone to database
+		// Save timezone to database as-is
 		$query = "UPDATE logger_settings SET timezone = :timezone";
 		$stmt = $conn->prepare($query);
-		$stmt->bindParam(':timezone', $timezone_offset);
+		$stmt->bindParam(':timezone', $timezone_input);
 		$stmt->execute();
+
+		// Prepare timezone for NTP: add + prefix if not already present
+		$tz_for_ntp = $timezone_input;
+		if (!preg_match('/^[+-]/', $tz_for_ntp)) {
+			$tz_for_ntp = '+' . $tz_for_ntp;
+		}
 
 		// Sync time with NTP server
 		// Using ntpdate if available, otherwise timedatectl
@@ -471,28 +463,6 @@ if (isset($_POST['import_calibration_csv'])) {
 		exit;
 	} catch (Exception $e) {
 		error_log('import_calibration_csv: ' . $e->getMessage());
-		$sensor_id = intval(isset($_POST['calibration_sensor_id']) ? $_POST['calibration_sensor_id'] : 1);
-		header('Location: atg_calibration.php?sensor=' . $sensor_id . '&error=' . urlencode($e->getMessage()));
-		exit;
-	}
-}
-
-if (isset($_POST['import_calibration_seed'])) {
-	try {
-		require_once 'import_calibration.php';
-		$sensor_id = intval(isset($_POST['calibration_sensor_id']) ? $_POST['calibration_sensor_id'] : 0);
-		if ($sensor_id < 1 || $sensor_id > 8) {
-			throw new InvalidArgumentException('Invalid sensor');
-		}
-		$seed = calibration_seed_path($sensor_id);
-		if (!is_readable($seed)) {
-			throw new RuntimeException('Seed file not found: calibration_T' . str_pad($sensor_id, 2, '0', STR_PAD_LEFT) . '.csv');
-		}
-		$count = import_calibration_csv($conn, $sensor_id, $seed);
-		header('Location: atg_calibration.php?sensor=' . $sensor_id . '&imported=' . $count);
-		exit;
-	} catch (Exception $e) {
-		error_log('import_calibration_seed: ' . $e->getMessage());
 		$sensor_id = intval(isset($_POST['calibration_sensor_id']) ? $_POST['calibration_sensor_id'] : 1);
 		header('Location: atg_calibration.php?sensor=' . $sensor_id . '&error=' . urlencode($e->getMessage()));
 		exit;

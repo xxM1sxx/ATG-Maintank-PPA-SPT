@@ -66,11 +66,6 @@ function import_calibration_csv($conn, $sensor_id, $csv_path) {
     return count($rows);
 }
 
-function calibration_seed_path($sensor_id) {
-    $sensor_id = intval($sensor_id);
-    return __DIR__ . '/seeds/calibration_T' . str_pad($sensor_id, 2, '0', STR_PAD_LEFT) . '.csv';
-}
-
 if (php_sapi_name() === 'cli') {
     if ($argc < 3) {
         fwrite(STDERR, "Usage: php import_calibration.php <sensor_id 1-8> <csv_path>\n");
