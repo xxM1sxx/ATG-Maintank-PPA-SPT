@@ -17,9 +17,23 @@ function update_reboot_schedule_cron_config($enabled, $timeValue)
         $cronContent .= $minute . ' ' . $hour . " * * * root /sbin/reboot\n";
     }
 
+    // Skip the rewrite entirely if the schedule hasn't actually changed since
+    // last time (this runs on every home.php page load via sync_reboot_schedule_from_db,
+    // so an unconditional rewrite here would race with cron reading the file
+    // right at the scheduled minute and could cause a missed reboot).
+    if (is_readable($cronTarget) && file_get_contents($cronTarget) === $cronContent) {
+        return;
+    }
+
     file_put_contents($cronFile, $cronContent);
-    shell_exec("echo 1234 | sudo -S /bin/cp " . escapeshellarg($cronFile) . ' ' . escapeshellarg($cronTarget));
-    shell_exec("echo 1234 | sudo -S /bin/chmod 644 " . escapeshellarg($cronTarget));
+
+    // Install atomically: write to a temp file in the same directory as the
+    // target, then rename over it. A plain `cp` can leave the target briefly
+    // empty/truncated mid-copy, which cron can catch as an invalid/empty file.
+    $cronTmp = $cronTarget . '.tmp';
+    shell_exec("echo 1234 | sudo -S /bin/cp " . escapeshellarg($cronFile) . ' ' . escapeshellarg($cronTmp));
+    shell_exec("echo 1234 | sudo -S /bin/chmod 644 " . escapeshellarg($cronTmp));
+    shell_exec("echo 1234 | sudo -S /bin/mv -f " . escapeshellarg($cronTmp) . ' ' . escapeshellarg($cronTarget));
 }
 
 function sync_reboot_schedule_from_db($pdo)

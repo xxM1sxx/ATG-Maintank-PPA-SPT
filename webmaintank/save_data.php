@@ -18,6 +18,26 @@ function save_redirect($params = '') {
 	exit;
 }
 
+// Convert a GMT offset like "7", "+7", "-5" into a valid Etc/GMT zone name
+// for timedatectl. Etc/GMT sign is inverted per POSIX (Etc/GMT-7 = UTC+7).
+// Returns null for fractional offsets (e.g. "5:30") which Etc/GMT can't express.
+function atg_offset_to_timezone($offset) {
+	if (!preg_match('/^([+-]?)(\d{1,2})(?::(\d{2}))?$/', trim($offset), $m)) {
+		return null;
+	}
+	$sign = ($m[1] === '-') ? '-' : '+';
+	$hour = intval($m[2]);
+	$min = isset($m[3]) ? intval($m[3]) : 0;
+	if ($min !== 0 || $hour > 14) {
+		return null;
+	}
+	if ($hour === 0) {
+		return 'UTC';
+	}
+	$etcSign = ($sign === '+') ? '-' : '+';
+	return "Etc/GMT{$etcSign}{$hour}";
+}
+
 try {
 	ensure_atg_tables($conn);
 	ensure_logger_settings_columns($conn);
@@ -299,6 +319,11 @@ if (isset($_POST['set_date_time'])) {
 		$stmt->bindParam(':data_timezone', $data_timezone);
 		$stmt->execute();
 
+		$tz_name = atg_offset_to_timezone($data_timezone);
+		if ($tz_name) {
+			shell_exec("echo 1234 | sudo -S timedatectl set-timezone " . escapeshellarg($tz_name) . " 2>&1");
+		}
+
 		$set_current_date = $_POST['current_date'];
 		$set_current_time = $_POST['current_time'];
 		$newDate = date("d M Y", strtotime($set_current_date));
@@ -330,12 +355,6 @@ if (isset($_POST['sync_ntp'])) {
 		$stmt->bindParam(':timezone', $timezone_input);
 		$stmt->execute();
 
-		// Prepare timezone for NTP: add + prefix if not already present
-		$tz_for_ntp = $timezone_input;
-		if (!preg_match('/^[+-]/', $tz_for_ntp)) {
-			$tz_for_ntp = '+' . $tz_for_ntp;
-		}
-
 		// Sync time with NTP server
 		// Using ntpdate if available, otherwise timedatectl
 		$ntp_cmd = "echo 1234 | sudo -S ntpdate -s " . escapeshellarg($ntp_server) . " 2>&1";
@@ -347,9 +366,12 @@ if (isset($_POST['sync_ntp'])) {
 			shell_exec($ntp_cmd);
 		}
 
-		// Set system timezone
-		$tz_cmd = "echo 1234 | sudo -S timedatectl set-timezone 'UTC' 2>&1";
-		shell_exec($tz_cmd);
+		// Set system timezone to match the configured GMT offset
+		$tz_name = atg_offset_to_timezone($timezone_input);
+		if ($tz_name) {
+			$tz_cmd = "echo 1234 | sudo -S timedatectl set-timezone " . escapeshellarg($tz_name) . " 2>&1";
+			shell_exec($tz_cmd);
+		}
 
 		// Write to hardware clock
 		shell_exec("echo 1234 | sudo -S hwclock -w -f /dev/rtc0 2>&1");
