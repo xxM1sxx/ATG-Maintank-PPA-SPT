@@ -84,6 +84,30 @@ function ensure_atg_tables($conn) {
         // ignore
     }
 
+    // Cloud MQTT: reuses the same broker/credentials as tbl_atg_mqtt_setting above,
+    // just adds its own topic(s)/interval/enabled columns to that singleton row.
+    foreach (array(
+        "cloud_topic_path TEXT NOT NULL DEFAULT ''",
+        "cloud_request_topic TEXT NOT NULL DEFAULT ''",
+        "cloud_publish_interval_sec INTEGER NOT NULL DEFAULT 120",
+        "cloud_enabled INTEGER NOT NULL DEFAULT 0",
+        "cloud_store_on_fail INTEGER NOT NULL DEFAULT 1",
+    ) as $col) {
+        try {
+            $conn->exec("ALTER TABLE tbl_atg_mqtt_setting ADD COLUMN $col");
+        } catch (PDOException $e) {
+            // column already exists
+        }
+    }
+
+    // Pending/failed-queue for cloud publishes that didn't get a PUBACK, and the
+    // batches replayed on request.
+    $conn->exec("CREATE TABLE IF NOT EXISTS tbl_atg_cloud_pending (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        payload TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )");
+
     // Clean up stray rows beyond 8-channel schema
     try {
         $conn->exec("DELETE FROM tbl_atg_reading WHERE sensor_id > 8");

@@ -311,6 +311,23 @@ if (isset($_POST['save_digital_output_settings'])) {
 	}
 }
 
+if (isset($_POST['sync'])) {
+	try {
+		$local_pc_datetime = $_COOKIE['myJavascriptVar'] ?? '';
+		if (empty($local_pc_datetime)) {
+			throw new Exception('Browser time not available, please try again');
+		}
+		shell_exec("echo 1234 | sudo -S date -s " . escapeshellarg($local_pc_datetime) . " 2>&1");
+		shell_exec("echo 1234 | sudo -S hwclock -w -f /dev/rtc0 2>&1");
+		shell_exec("echo 1234 | sudo -S hwclock -w -f /dev/rtc1 2>&1");
+
+		save_redirect('saved=pctime');
+	} catch (Exception $e) {
+		error_log('sync (PC time): ' . $e->getMessage());
+		save_redirect('error=' . urlencode($e->getMessage()));
+	}
+}
+
 if (isset($_POST['set_date_time'])) {
 	try {
 		$data_timezone = $_POST['data_timezone'];
@@ -559,12 +576,47 @@ if (isset($_POST['save_pss_setting'])) {
 			$stmt->bindParam(':plant_id', $plant_id);
 			$stmt->execute();
 
-			header('location: home.php');
-			$conn = null;
+			save_redirect('saved=mqtt');
 		} catch (Exception $e) {
 			error_log('save_mqtt_settings: ' . $e->getMessage());
-			header('location: home.php?error=' . urlencode($e->getMessage()));
-			$conn = null;
+			save_redirect('error=' . urlencode($e->getMessage()));
+		}
+	}
+
+	if (isset($_POST['save_cloud_mqtt_settings'])) {
+		try {
+			$cloud_topic_path = trim($_POST['cloud_topic_path'] ?? '');
+			$cloud_request_topic = trim($_POST['cloud_request_topic'] ?? '');
+			$cloud_interval = intval($_POST['cloud_interval'] ?? 120);
+			$cloud_enabled = isset($_POST['cloud_enabled']) ? 1 : 0;
+			$cloud_store_on_fail = isset($_POST['cloud_store_on_fail']) ? 1 : 0;
+
+			if ($cloud_enabled && (empty($cloud_topic_path) || empty($cloud_request_topic))) {
+				throw new Exception('Cloud data topic and request topic are required when Cloud MQTT is enabled');
+			}
+			if ($cloud_interval < 1 || $cloud_interval > 300) {
+				throw new Exception('Cloud publish interval must be between 1 and 300 seconds');
+			}
+
+			$query = "UPDATE tbl_atg_mqtt_setting SET
+						cloud_topic_path = :cloud_topic_path,
+						cloud_request_topic = :cloud_request_topic,
+						cloud_publish_interval_sec = :cloud_interval,
+						cloud_enabled = :cloud_enabled,
+						cloud_store_on_fail = :cloud_store_on_fail
+					  WHERE id = 1";
+			$stmt = $conn->prepare($query);
+			$stmt->bindParam(':cloud_topic_path', $cloud_topic_path);
+			$stmt->bindParam(':cloud_request_topic', $cloud_request_topic);
+			$stmt->bindParam(':cloud_interval', $cloud_interval, PDO::PARAM_INT);
+			$stmt->bindParam(':cloud_enabled', $cloud_enabled, PDO::PARAM_INT);
+			$stmt->bindParam(':cloud_store_on_fail', $cloud_store_on_fail, PDO::PARAM_INT);
+			$stmt->execute();
+
+			save_redirect('saved=cloud_mqtt');
+		} catch (Exception $e) {
+			error_log('save_cloud_mqtt_settings: ' . $e->getMessage());
+			save_redirect('error=' . urlencode($e->getMessage()));
 		}
 	}
 
@@ -589,12 +641,10 @@ if (isset($_POST['save_pss_setting'])) {
 				$stmt->execute();
 			}
 
-			header('location: home.php');
-			$conn = null;
+			save_redirect('saved=sensor_metadata');
 		} catch (Exception $e) {
 			error_log('save_sensor_metadata: ' . $e->getMessage());
-			header('location: home.php?error=' . urlencode($e->getMessage()));
-			$conn = null;
+			save_redirect('error=' . urlencode($e->getMessage()));
 		}
 	}
 

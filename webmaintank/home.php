@@ -326,12 +326,22 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-wrap: wrap;
     }
 
     .form-group label {
         margin: 0;
         width: auto;
         min-width: 200px;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="password"],
+    .form-group select {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: 100%;
     }
 
     input[type="text"],
@@ -404,6 +414,7 @@
         font-size: 12px;
         color: #666;
         margin-top: 4px;
+        margin-bottom: 12px;
     }
 
     .status-online {
@@ -609,6 +620,13 @@
         $data_mqtt_company = 'PT. Putra Perkasa Abadi';
         $data_mqtt_plant_id = 'PPA-BA';
 
+        // Load Cloud MQTT Settings (shares the broker/credentials above; own topics+interval)
+        $data_cloud_topic_path = 'maintank/atg/cloud/value';
+        $data_cloud_request_topic = 'maintank/atg/cloud/request';
+        $data_cloud_interval = 120;
+        $data_cloud_enabled = false;
+        $data_cloud_store_on_fail = true;
+
         $result_mqtt = $db->query("SELECT * FROM tbl_atg_mqtt_setting WHERE id=1");
         if ($result_mqtt) {
             $row_mqtt = $result_mqtt->fetchArray(SQLITE3_ASSOC);
@@ -621,6 +639,16 @@
                 $data_mqtt_interval = intval($row_mqtt['publish_interval_sec'] ?? 30);
                 $data_mqtt_company = $row_mqtt['company_name'] ?? 'PT. Putra Perkasa Abadi';
                 $data_mqtt_plant_id = $row_mqtt['plant_id'] ?? 'PPA-BA';
+
+                if (!empty($row_mqtt['cloud_topic_path'])) {
+                    $data_cloud_topic_path = $row_mqtt['cloud_topic_path'];
+                }
+                if (!empty($row_mqtt['cloud_request_topic'])) {
+                    $data_cloud_request_topic = $row_mqtt['cloud_request_topic'];
+                }
+                $data_cloud_interval = intval($row_mqtt['cloud_publish_interval_sec'] ?? 120);
+                $data_cloud_enabled = intval($row_mqtt['cloud_enabled'] ?? 0) === 1;
+                $data_cloud_store_on_fail = intval($row_mqtt['cloud_store_on_fail'] ?? 1) === 1;
             }
         }
 
@@ -873,6 +901,12 @@
                                 MQTT Settings
                             </div>
                             <div class="tab__item">
+                                Cloud MQTT
+                            </div>
+                            <div class="tab__item">
+                                Download
+                            </div>
+                            <div class="tab__item">
                                 Sensor Metadata
                             </div>
                             <!-- <?php
@@ -969,17 +1003,6 @@
                                     </form>
                                 </div>
 
-                                <?php
-									if (isset($_POST['sync']))
-									{
-										$local_pc_datetime= $_COOKIE['myJavascriptVar'];
-										shell_exec("echo 1234 | sudo -S date -s '$local_pc_datetime'");
-
-										shell_exec("echo 1234 | sudo hwclock -w");
-										header('location: home.php');
-									}
-								?>
-
                                 <div class="form-section multi-form">
                                     <strong>Time Settings</strong>
 
@@ -1005,7 +1028,7 @@
                                         </div>
                                     </form>
 
-                                    <form method="post">
+                                    <form method="post" action="save_data.php">
                                         <span class="settings-subtitle">Sync with PC</span>
                                         <div class="form-group">
                                             <input type="submit" name="sync" value="Synchronize with PC Time">
@@ -1162,6 +1185,80 @@
                                             <input type="submit" name="save_mqtt_settings" value="Save MQTT Settings">
                                         </div>
                                     </form>
+                                </div>
+                            </div>
+
+                            <div class="tab__content-item">
+                                <div class="form-section">
+                                    <strong>Cloud MQTT Settings</strong>
+                                    <form method="post" action="save_data.php">
+                                        <div class="form-group">
+                                            <label for="cloud_topic_path">Cloud Data Topic:</label>
+                                            <input type="text" id="cloud_topic_path" name="cloud_topic_path" value="<?php echo htmlspecialchars($data_cloud_topic_path); ?>" placeholder="maintank/atg/cloud/value">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cloud_request_topic">Cloud Request:</label>
+                                            <input type="text" id="cloud_request_topic" name="cloud_request_topic" value="<?php echo htmlspecialchars($data_cloud_request_topic); ?>" placeholder="maintank/atg/cloud/request">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cloud_interval">Publish Interval (s):</label>
+                                            <input type="number" id="cloud_interval" name="cloud_interval" value="<?php echo $data_cloud_interval; ?>" min="1" max="300">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-label"><input type="checkbox" id="cloud_enabled" name="cloud_enabled" value="1" <?php echo $data_cloud_enabled ? 'checked' : ''; ?>> Enable Cloud MQTT</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-label"><input type="checkbox" id="cloud_store_on_fail" name="cloud_store_on_fail" value="1" <?php echo $data_cloud_store_on_fail ? 'checked' : ''; ?>> Save to database when ACK fails</label>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" name="save_cloud_mqtt_settings" value="Save Cloud MQTT Settings">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="tab__content-item">
+                                <div class="form-section">
+                                    <strong>Pending Cloud MQTT Data</strong>
+                                    <?php
+                                        $cloud_pending_count = 0;
+                                        $cloud_pending_rows = array();
+                                        $result_pending_count = $db->query("SELECT COUNT(*) AS c FROM tbl_atg_cloud_pending");
+                                        if ($result_pending_count) {
+                                            $row_count = $result_pending_count->fetchArray(SQLITE3_ASSOC);
+                                            $cloud_pending_count = $row_count ? intval($row_count['c']) : 0;
+                                        }
+                                        $result_pending_rows = $db->query("SELECT id, payload, created_at FROM tbl_atg_cloud_pending ORDER BY id ASC LIMIT 200");
+                                        if ($result_pending_rows) {
+                                            while ($row_pending = $result_pending_rows->fetchArray(SQLITE3_ASSOC)) {
+                                                $cloud_pending_rows[] = $row_pending;
+                                            }
+                                        }
+                                    ?>
+                                    <div class="form-actions">
+                                        <span>Total pending: <strong><?php echo $cloud_pending_count; ?></strong></span>
+                                        <a href="download_cloud_pending.php" class="btn">Download CSV</a>
+                                    </div>
+                                    <?php if (empty($cloud_pending_rows)): ?>
+                                    <p class="form-note">No pending data.</p>
+                                    <?php else: ?>
+                                    <div class="table-scroll" style="max-height: 400px; overflow-y: auto; margin-top: 12px;">
+                                        <table>
+                                            <tr><th>#</th><th>ID</th><th>Created At (UTC)</th><th>Payload</th></tr>
+                                            <?php $row_num = 0; foreach ($cloud_pending_rows as $row_pending): $row_num++; ?>
+                                            <tr>
+                                                <td><?php echo $row_num; ?></td>
+                                                <td><?php echo intval($row_pending['id']); ?></td>
+                                                <td><?php echo htmlspecialchars($row_pending['created_at']); ?></td>
+                                                <td><?php echo htmlspecialchars(substr($row_pending['payload'], 0, 120)); ?><?php echo (strlen($row_pending['payload']) > 120) ? '...' : ''; ?></td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        </table>
+                                    </div>
+                                    <?php if ($cloud_pending_count > 200): ?>
+                                    <p class="form-note">Showing the oldest 200 of <?php echo $cloud_pending_count; ?> rows. Use "Download CSV" for the full list.</p>
+                                    <?php endif; ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 

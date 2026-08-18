@@ -6,12 +6,19 @@
 #include <sqlite3.h>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 // Forward declare for atg_app namespace
 struct MqttConfig;
+struct CloudMqttConfig;
 struct SensorData;
 
 namespace atg_app {
+
+struct PendingCloudRow {
+    int64_t id;
+    std::string payload;
+};
 
 class AtgDatabase {
 public:
@@ -26,6 +33,14 @@ public:
     MqttConfig load_mqtt_config();
     std::vector<SensorData> load_sensor_data_for_mqtt();
     bool is_open() const { return db_ != nullptr; }
+
+    // Cloud MQTT: config + pending/failed-queue table CRUD.
+    CloudMqttConfig load_cloud_mqtt_config();
+    void insert_pending_cloud_row(const std::string& payload);
+    std::vector<PendingCloudRow> select_pending_cloud_batch(int limit);
+    void delete_pending_cloud_rows(const std::vector<int64_t>& ids);
+    void trim_pending_cloud_rows(int cap);
+    int count_pending_cloud_rows();
 
 private:
     double load_offset_mm(int sensor_id);

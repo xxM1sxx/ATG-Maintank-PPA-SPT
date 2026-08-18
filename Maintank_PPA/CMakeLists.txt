@@ -27,6 +27,7 @@ if(ATG_BUILD_READER)
         src/atg_db.cpp
         src/volume_lookup.cpp
         src/mqtt_publisher.cpp
+        src/sys_stats.cpp
     )
     target_include_directories(atg-reader PRIVATE include)
     if(SQLITE3_INCLUDE_DIR)

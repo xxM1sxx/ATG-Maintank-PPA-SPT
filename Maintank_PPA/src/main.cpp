@@ -1,5 +1,6 @@
 #include "atg_db.hpp"
 #include "mqtt_publisher.hpp"
+#include "sys_stats.hpp"
 #include <atg/debug_log.hpp>
 #include <atg/sensor_manager.hpp>
 #include <atomic>
@@ -54,8 +55,9 @@ int main(int argc, char* argv[]) {
         print_startup_banner(db_path, configs);
 
         MqttConfig mqtt_config = db.load_mqtt_config();
-        MqttPublisher publisher(mqtt_config, "PT. Putra Perkasa Abadi", "PPA-BA");
-        if (mqtt_config.enabled) {
+        CloudMqttConfig cloud_config = db.load_cloud_mqtt_config();
+        MqttPublisher publisher(mqtt_config, cloud_config, "PT. Putra Perkasa Abadi", "PPA-BA", &db);
+        if (mqtt_config.enabled || cloud_config.enabled) {
             publisher.init();
         }
 
@@ -66,6 +68,7 @@ int main(int argc, char* argv[]) {
         mgr.start();
 
         auto last_publish = std::chrono::steady_clock::now();
+        auto last_mem_check = std::chrono::steady_clock::now();
 
         while (g_running) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -77,6 +80,25 @@ int main(int argc, char* argv[]) {
                     auto sensors = db.load_sensor_data_for_mqtt();
                     publisher.publish_telemetry(sensors);
                     last_publish = now;
+                }
+            }
+
+            if (cloud_config.enabled) {
+                auto sensors = db.load_sensor_data_for_mqtt();
+                publisher.publish_cloud_telemetry(sensors);  // own internal interval gate
+                publisher.check_ack_timeouts();
+                publisher.poll_replay_request();
+
+                auto now = std::chrono::steady_clock::now();
+                auto mem_elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - last_mem_check).count();
+                if (mem_elapsed >= 60) {
+                    last_mem_check = now;
+                    double used_pct = atg_app::read_used_memory_percent();
+                    if (used_pct >= 80.0) {
+                        atg::atg_log(atg::LogLevel::Warn, "MQTT",
+                            "Memory usage %.1f%% >= 80%%, trimming cloud pending queue to 500 rows", used_pct);
+                        db.trim_pending_cloud_rows(500);
+                    }
                 }
             }
         }

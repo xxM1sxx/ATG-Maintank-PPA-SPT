@@ -211,12 +211,15 @@ std::vector<SensorData> AtgDatabase::load_sensor_data_for_mqtt() {
     std::vector<SensorData> sensors;
     if (!db_) return sensors;
 
+    // Only include sensors with a successful, non-null last reading - a failed
+    // Modbus read (r.ok=0) must never be published as if it were a real 0 L /
+    // 0 mm reading, to either the local or cloud MQTT topic (both share this query).
     const char* sql =
         "SELECT s.id, s.slocn, s.sensor_number, s.capacity_liters, "
         "       r.position_mm, r.volume, r.fuel_temp_c "
         "FROM tbl_atg_sensor s "
-        "LEFT JOIN tbl_atg_reading r ON s.id = r.sensor_id "
-        "WHERE s.enabled=1 ORDER BY s.id";
+        "JOIN tbl_atg_reading r ON s.id = r.sensor_id "
+        "WHERE s.enabled=1 AND r.ok=1 ORDER BY s.id";
 
     sqlite3_stmt* stmt = nullptr;
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK)
@@ -241,6 +244,130 @@ std::vector<SensorData> AtgDatabase::load_sensor_data_for_mqtt() {
 
     sqlite3_finalize(stmt);
     return sensors;
+}
+
+CloudMqttConfig AtgDatabase::load_cloud_mqtt_config() {
+    CloudMqttConfig config;
+    config.publish_interval_sec = 120;
+    config.enabled = false;
+    config.store_on_fail = true;
+
+    if (!db_) {
+        return config;
+    }
+
+    const char* sql = "SELECT cloud_topic_path, cloud_request_topic, "
+                      "cloud_publish_interval_sec, cloud_enabled, cloud_store_on_fail "
+                      "FROM tbl_atg_mqtt_setting WHERE id=1";
+
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return config;
+    }
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        const char* topic = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        config.data_topic = topic ? topic : "";
+
+        const char* req_topic = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        config.request_topic = req_topic ? req_topic : "";
+
+        config.publish_interval_sec = sqlite3_column_int(stmt, 2);
+        config.enabled = sqlite3_column_int(stmt, 3) != 0;
+        config.store_on_fail = sqlite3_column_int(stmt, 4) != 0;
+    }
+
+    sqlite3_finalize(stmt);
+    return config;
+}
+
+void AtgDatabase::insert_pending_cloud_row(const std::string& payload) {
+    if (!db_) return;
+
+    const char* sql = "INSERT INTO tbl_atg_cloud_pending (payload) VALUES (?)";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return;
+    }
+    sqlite3_bind_text(stmt, 1, payload.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+}
+
+std::vector<PendingCloudRow> AtgDatabase::select_pending_cloud_batch(int limit) {
+    std::vector<PendingCloudRow> rows;
+    if (!db_) return rows;
+
+    const char* sql = "SELECT id, payload FROM tbl_atg_cloud_pending ORDER BY id ASC LIMIT ?";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return rows;
+    }
+    sqlite3_bind_int(stmt, 1, limit);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        PendingCloudRow row;
+        row.id = sqlite3_column_int64(stmt, 0);
+        const char* payload = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        row.payload = payload ? payload : "";
+        rows.push_back(row);
+    }
+
+    sqlite3_finalize(stmt);
+    return rows;
+}
+
+void AtgDatabase::delete_pending_cloud_rows(const std::vector<int64_t>& ids) {
+    if (!db_ || ids.empty()) return;
+
+    std::string sql = "DELETE FROM tbl_atg_cloud_pending WHERE id IN (";
+    for (size_t i = 0; i < ids.size(); ++i) {
+        if (i > 0) sql += ",";
+        sql += "?";
+    }
+    sql += ")";
+
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        return;
+    }
+    for (size_t i = 0; i < ids.size(); ++i) {
+        sqlite3_bind_int64(stmt, static_cast<int>(i) + 1, ids[i]);
+    }
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+}
+
+int AtgDatabase::count_pending_cloud_rows() {
+    if (!db_) return 0;
+
+    const char* sql = "SELECT COUNT(*) FROM tbl_atg_cloud_pending";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return 0;
+    }
+
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+void AtgDatabase::trim_pending_cloud_rows(int cap) {
+    if (!db_) return;
+
+    const char* sql = "DELETE FROM tbl_atg_cloud_pending WHERE id NOT IN "
+                      "(SELECT id FROM tbl_atg_cloud_pending ORDER BY id DESC LIMIT ?)";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return;
+    }
+    sqlite3_bind_int(stmt, 1, cap);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
 }
 
 } // namespace atg_app
