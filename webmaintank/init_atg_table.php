@@ -1,5 +1,28 @@
 <?php
 function ensure_atg_tables($conn) {
+    // This function issues ~20 separate writes (CREATE/ALTER/INSERT). Left as
+    // individual autocommit statements, each one is its own SQLite transaction
+    // with its own fsync - on slow eMMC/SD storage that's ~20 disk syncs on
+    // every single page load and every save, easily adding up to seconds. Wrap
+    // it all in one transaction so it's a single fsync instead.
+    $own_transaction = !$conn->inTransaction();
+    if ($own_transaction) {
+        $conn->beginTransaction();
+    }
+    try {
+        ensure_atg_tables_inner($conn);
+        if ($own_transaction) {
+            $conn->commit();
+        }
+    } catch (Exception $e) {
+        if ($own_transaction && $conn->inTransaction()) {
+            $conn->rollBack();
+        }
+        throw $e;
+    }
+}
+
+function ensure_atg_tables_inner($conn) {
     $conn->exec("CREATE TABLE IF NOT EXISTS tbl_atg_sensor (
         id INTEGER PRIMARY KEY CHECK (id BETWEEN 1 AND 8),
         label TEXT NOT NULL DEFAULT '',
@@ -52,7 +75,7 @@ function ensure_atg_tables($conn) {
         FOREIGN KEY (sensor_id) REFERENCES tbl_atg_sensor(id)
     )");
 
-    foreach (array('water_mm REAL', 'fuel_temp_c REAL') as $col) {
+    foreach (array('water_mm REAL', 'fuel_temp_c REAL', 'volume_water_l REAL', 'volume_total_l REAL') as $col) {
         try {
             $conn->exec("ALTER TABLE tbl_atg_reading ADD COLUMN $col");
         } catch (PDOException $e) {
@@ -117,29 +140,26 @@ function ensure_atg_tables($conn) {
         // ignore
     }
 
-    // Seed sensors 7-8 into existing tables that still have old CHECK(1..6) constraint
+    // Seed any missing sensor rows 1-8 (fresh install: none exist yet; older
+    // installs upgraded from a CHECK(1..6) schema: only 7-8 are missing).
+    // INSERT OR IGNORE is idempotent - safe to run unconditionally every time,
+    // unlike a COUNT(*)==0 gate which breaks if some rows already exist.
     try {
         $conn->exec("PRAGMA ignore_check_constraints = ON");
-        $conn->exec("INSERT OR IGNORE INTO tbl_atg_sensor (id, label, device) VALUES (7, 'TANKI-7', '/dev/ttyACM6'), (8, 'TANKI-8', '/dev/ttyACM7')");
-    } catch (PDOException $e) {
-        // ignore
-    } finally {
-        try { $conn->exec("PRAGMA ignore_check_constraints = OFF"); } catch (PDOException $e) {}
-    }
-
-    $stmt = $conn->query("SELECT COUNT(*) FROM tbl_atg_sensor");
-    $count = $stmt->fetchColumn();
-    if ($count == 0) {
         for ($i = 1; $i <= 8; $i++) {
             $label = "TANKI-$i";
             $device = "/dev/ttyACM" . ($i - 1);
             $insert = $conn->prepare(
-                "INSERT INTO tbl_atg_sensor (id, label, enabled, device) VALUES (:id, :label, 0, :device)"
+                "INSERT OR IGNORE INTO tbl_atg_sensor (id, label, enabled, device) VALUES (:id, :label, 0, :device)"
             );
             $insert->bindParam(':id', $i, PDO::PARAM_INT);
             $insert->bindParam(':label', $label);
             $insert->bindParam(':device', $device);
             $insert->execute();
         }
+    } catch (PDOException $e) {
+        // ignore
+    } finally {
+        try { $conn->exec("PRAGMA ignore_check_constraints = OFF"); } catch (PDOException $e) {}
     }
 }

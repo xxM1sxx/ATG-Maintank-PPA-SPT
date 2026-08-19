@@ -835,8 +835,10 @@
                                         <th>Offset (mm)</th>
                                         <th>Probe (mm)</th>
                                         <th>Sounding (mm)</th>
-                                        <th>Volume (L)</th>
+                                        <th>Fuel Vol (L)</th>
                                         <th>Water (mm)</th>
+                                        <th>Water Vol (L)</th>
+                                        <th>Total Vol (L)</th>
                                         <th>Temp (°C)</th>
                                         <th>Last Update</th>
                                     </tr>
@@ -851,6 +853,8 @@
                                         <td class="atg-sounding">—</td>
                                         <td class="atg-volume">—</td>
                                         <td class="atg-water">—</td>
+                                        <td class="atg-volume-water">—</td>
+                                        <td class="atg-volume-total">—</td>
                                         <td class="atg-temp">—</td>
                                         <td class="atg-updated">—</td>
                                     </tr>
@@ -1610,6 +1614,10 @@
 						}
 						row.querySelector('.atg-water').innerText =
 							(isEnabled && s.water_mm != null) ? s.water_mm.toFixed(1) : '—';
+						row.querySelector('.atg-volume-water').innerText =
+							(isEnabled && s.volume_water_l != null) ? s.volume_water_l.toFixed(1) : '—';
+						row.querySelector('.atg-volume-total').innerText =
+							(isEnabled && s.volume_total_l != null) ? s.volume_total_l.toFixed(1) : '—';
 						row.querySelector('.atg-temp').innerText =
 							(isEnabled && s.fuel_temp_c != null) ? s.fuel_temp_c.toFixed(1) : '—';
 						row.querySelector('.atg-updated').innerText = s.updated_at || '—';

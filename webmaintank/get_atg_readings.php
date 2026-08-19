@@ -9,14 +9,18 @@ if (empty($_SESSION['username'])) {
 }
 
 require_once 'conn.php';
-require_once 'init_atg_table.php';
-ensure_atg_tables($conn);
 
+// No ensure_atg_tables() here on purpose - this endpoint is polled every 5s by
+// the Status page's live-update JS, and the schema is already guaranteed to
+// exist by the time this runs (home.php, which embeds the JS that polls this,
+// ensures it on its own load). Re-running the ~20-statement migration check
+// every 5 seconds for the lifetime of an open browser tab is pure waste.
 header('Content-Type: application/json');
 
 $query = "SELECT s.id, s.label, s.enabled, s.device, s.slave_id, s.baudrate, s.polling_interval_ms,
                  s.offset_mm,
                  r.position_mm, r.volume, r.water_mm, r.fuel_temp_c, r.offset AS reading_offset,
+                 r.volume_water_l, r.volume_total_l,
                  r.ok, r.error_msg, r.updated_at
           FROM tbl_atg_sensor s
           LEFT JOIN tbl_atg_reading r ON r.sensor_id = s.id
@@ -50,6 +54,8 @@ foreach ($rows as &$row) {
     if ($row['water_mm'] !== null) $row['water_mm'] = floatval($row['water_mm']);
     if ($row['fuel_temp_c'] !== null) $row['fuel_temp_c'] = floatval($row['fuel_temp_c']);
     if ($row['reading_offset'] !== null) $row['reading_offset'] = floatval($row['reading_offset']);
+    if ($row['volume_water_l'] !== null) $row['volume_water_l'] = floatval($row['volume_water_l']);
+    if ($row['volume_total_l'] !== null) $row['volume_total_l'] = floatval($row['volume_total_l']);
 }
 unset($row);
 

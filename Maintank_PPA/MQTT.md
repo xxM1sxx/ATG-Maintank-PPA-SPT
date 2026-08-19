@@ -79,6 +79,25 @@ A sensor is **only** included if its last Modbus read succeeded (`ok=1` in
 0 L reading — it's just omitted from `data[]` until the next successful read.
 This filtering applies to the Cloud Data Topic too (same underlying query).
 
+**`volume_l` is total liquid volume** (`TeraTable(fuel_level_mm)` looked up
+directly, no water subtraction) — this is the original/legacy MQTT field
+shape and is deliberately kept as-is. The SP400 probe's fuel float rides on
+top of everything, so `fuel_level_mm` is actually the *total* liquid
+sounding (fuel + water combined), not fuel alone.
+
+**`fuel_level_mm` includes the sensor's calibration offset** (raw probe
+reading + `offset_mm`, i.e. the true "sounding" height) — not the raw,
+unadjusted probe value — because that's the exact height `volume_l` was
+computed from. Reporting the raw value here while `volume_l` was computed
+from the offset-adjusted height would make the two fields inconsistent with
+each other.
+
+A separate fuel/water breakdown (fuel-only volume, water-layer volume, and
+this same total) **is** computed and stored per reading
+(`tbl_atg_reading.volume` / `volume_water_l` / `volume_total_l`), but is only
+surfaced in the **web UI** (Status → Fuel Level Sensors: "Fuel Vol (L)" /
+"Water Vol (L)" / "Total Vol (L)" columns) — it is not sent over MQTT.
+
 ### Log lines
 
 ```

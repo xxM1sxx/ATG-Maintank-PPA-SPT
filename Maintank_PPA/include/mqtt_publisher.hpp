@@ -53,7 +53,11 @@ struct SensorData {
     std::string number;
     double capacity_l;
     double fuel_level_mm;
-    double volume_l;
+    double volume_l;        // total sounding volume (TeraTable(fuel_level_mm) directly, no water
+                             // subtraction) - matches this field's original/legacy meaning. The
+                             // fuel-only and water-only breakdown is computed and stored in the DB
+                             // for the web UI (see tbl_atg_reading.volume / volume_water_l), but is
+                             // intentionally not sent over MQTT.
     double temperature_c;
 };
 
