@@ -40,6 +40,7 @@ function ensure_atg_tables_inner($conn) {
     foreach (array(
         'zero_offset_mm REAL NOT NULL DEFAULT 0',
         'offset_mm REAL NOT NULL DEFAULT 0',
+        'offset_mm_water REAL NOT NULL DEFAULT 0',
         'slocn TEXT NOT NULL DEFAULT \'FS-01\'',
         'sensor_number TEXT NOT NULL DEFAULT \'01\'',
         'capacity_liters REAL NOT NULL DEFAULT 40000.0',
@@ -75,7 +76,7 @@ function ensure_atg_tables_inner($conn) {
         FOREIGN KEY (sensor_id) REFERENCES tbl_atg_sensor(id)
     )");
 
-    foreach (array('water_mm REAL', 'fuel_temp_c REAL', 'volume_water_l REAL', 'volume_total_l REAL') as $col) {
+    foreach (array('water_mm REAL', 'fuel_temp_c REAL', 'volume_water_l REAL', 'volume_total_l REAL', 'offset_water REAL') as $col) {
         try {
             $conn->exec("ALTER TABLE tbl_atg_reading ADD COLUMN $col");
         } catch (PDOException $e) {

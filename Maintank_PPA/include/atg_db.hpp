@@ -44,6 +44,7 @@ public:
 
 private:
     double load_offset_mm(int sensor_id);
+    double load_offset_mm_water(int sensor_id);
     std::vector<VolumePoint> load_volume_points(int sensor_id);
 
     sqlite3* db_ = nullptr;

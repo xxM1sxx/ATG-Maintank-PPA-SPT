@@ -18,9 +18,9 @@ require_once 'conn.php';
 header('Content-Type: application/json');
 
 $query = "SELECT s.id, s.label, s.enabled, s.device, s.slave_id, s.baudrate, s.polling_interval_ms,
-                 s.offset_mm,
+                 s.offset_mm, s.offset_mm_water,
                  r.position_mm, r.volume, r.water_mm, r.fuel_temp_c, r.offset AS reading_offset,
-                 r.volume_water_l, r.volume_total_l,
+                 r.volume_water_l,
                  r.ok, r.error_msg, r.updated_at
           FROM tbl_atg_sensor s
           LEFT JOIN tbl_atg_reading r ON r.sensor_id = s.id
@@ -38,24 +38,34 @@ foreach ($rows as &$row) {
     $row['polling_interval_ms'] = intval($row['polling_interval_ms']);
     $row['ok'] = isset($row['ok']) ? intval($row['ok']) : 0;
 
-    $offset_mm = isset($row['offset_mm']) ? floatval($row['offset_mm']) : 0.0;
-    $row['offset_mm'] = $offset_mm;
+    $offset_fuel_mm = isset($row['offset_mm']) ? floatval($row['offset_mm']) : 0.0;
+    $offset_water_mm = isset($row['offset_mm_water']) ? floatval($row['offset_mm_water']) : 0.0;
+    $row['offset_fuel_mm'] = $offset_fuel_mm;
+    $row['offset_water_mm'] = $offset_water_mm;
+    unset($row['offset_mm'], $row['offset_mm_water']);
 
     if ($row['position_mm'] !== null) {
-        $probe_mm = floatval($row['position_mm']);
-        $row['probe_mm'] = $probe_mm;
-        $row['sounding_mm'] = $probe_mm + $offset_mm;
+        $fuel_mm = floatval($row['position_mm']);
+        $row['fuel_mm'] = $fuel_mm;
+        $row['sounding_fuel_mm'] = $fuel_mm + $offset_fuel_mm;
     } else {
-        $row['probe_mm'] = null;
-        $row['sounding_mm'] = null;
+        $row['fuel_mm'] = null;
+        $row['sounding_fuel_mm'] = null;
+    }
+    unset($row['position_mm']);
+
+    if ($row['water_mm'] !== null) {
+        $water_mm = floatval($row['water_mm']);
+        $row['water_mm'] = $water_mm;
+        $row['sounding_water_mm'] = $water_mm + $offset_water_mm;
+    } else {
+        $row['sounding_water_mm'] = null;
     }
 
     if ($row['volume'] !== null) $row['volume'] = floatval($row['volume']);
-    if ($row['water_mm'] !== null) $row['water_mm'] = floatval($row['water_mm']);
     if ($row['fuel_temp_c'] !== null) $row['fuel_temp_c'] = floatval($row['fuel_temp_c']);
     if ($row['reading_offset'] !== null) $row['reading_offset'] = floatval($row['reading_offset']);
     if ($row['volume_water_l'] !== null) $row['volume_water_l'] = floatval($row['volume_water_l']);
-    if ($row['volume_total_l'] !== null) $row['volume_total_l'] = floatval($row['volume_total_l']);
 }
 unset($row);
 

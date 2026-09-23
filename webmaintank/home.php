@@ -832,13 +832,14 @@
                                         <th>Label</th>
                                         <th>Device</th>
                                         <th>Status</th>
-                                        <th>Offset (mm)</th>
-                                        <th>Probe (mm)</th>
-                                        <th>Sounding (mm)</th>
+                                        <th>Offset Fuel (mm)</th>
+                                        <th>Fuel (mm)</th>
+                                        <th>Sounding Fuel (mm)</th>
                                         <th>Fuel Vol (L)</th>
+                                        <th>Offset Water (mm)</th>
                                         <th>Water (mm)</th>
+                                        <th>Sounding Water (mm)</th>
                                         <th>Water Vol (L)</th>
-                                        <th>Total Vol (L)</th>
                                         <th>Temp (°C)</th>
                                         <th>Last Update</th>
                                     </tr>
@@ -848,13 +849,14 @@
                                         <td class="atg-label">—</td>
                                         <td class="atg-device">—</td>
                                         <td class="atg-status">—</td>
-                                        <td class="atg-offset">—</td>
-                                        <td class="atg-probe">—</td>
-                                        <td class="atg-sounding">—</td>
+                                        <td class="atg-offset-fuel">—</td>
+                                        <td class="atg-fuel">—</td>
+                                        <td class="atg-sounding-fuel">—</td>
                                         <td class="atg-volume">—</td>
+                                        <td class="atg-offset-water">—</td>
                                         <td class="atg-water">—</td>
+                                        <td class="atg-sounding-water">—</td>
                                         <td class="atg-volume-water">—</td>
-                                        <td class="atg-volume-total">—</td>
                                         <td class="atg-temp">—</td>
                                         <td class="atg-updated">—</td>
                                     </tr>
@@ -1106,7 +1108,8 @@
                                             <th>Baudrate</th>
                                             <th>DE GPIO</th>
                                             <th>Timeout (ms)</th>
-                                            <th>Offset (mm)</th>
+                                            <th>Fuel Offset (mm)</th>
+                                            <th>Water Offset (mm)</th>
                                             <th>Kalibrasi</th>
                                         </tr>
                                         <?php for ($i = 1; $i <= 8; $i++):
@@ -1120,6 +1123,7 @@
                                             $de_gpio = intval(isset($s['de_gpio_pin']) ? $s['de_gpio_pin'] : -1);
                                             $timeout = intval(isset($s['read_timeout_ms']) ? $s['read_timeout_ms'] : 3000);
                                             $offset_mm = floatval(isset($s['offset_mm']) ? $s['offset_mm'] : 0);
+                                            $offset_mm_water = floatval(isset($s['offset_mm_water']) ? $s['offset_mm_water'] : 0);
                                         ?>
                                         <tr>
                                             <td><?php echo $i; ?></td>
@@ -1138,6 +1142,7 @@
                                             <td><input type="text" name="atg_de_gpio_<?php echo $i; ?>" value="<?php echo $de_gpio; ?>" size="4"></td>
                                             <td><input type="text" name="atg_timeout_<?php echo $i; ?>" value="<?php echo $timeout; ?>" size="6"></td>
                                             <td><input type="text" name="atg_offset_mm_<?php echo $i; ?>" value="<?php echo $offset_mm; ?>" size="8"></td>
+                                            <td><input type="text" name="atg_offset_mm_water_<?php echo $i; ?>" value="<?php echo $offset_mm_water; ?>" size="8"></td>
                                             <td><a href="atg_calibration.php?sensor=<?php echo $i; ?>">Edit tabel &rarr;</a></td>
                                         </tr>
                                         <?php endfor; ?>
@@ -1600,24 +1605,26 @@
 							statusCell.className = 'atg-status status-offline';
 						}
 
-						row.querySelector('.atg-offset').innerText =
-							isEnabled ? s.offset_mm.toFixed(1) : '—';
-						row.querySelector('.atg-probe').innerText =
-							(isEnabled && s.probe_mm != null) ? s.probe_mm.toFixed(1) : '—';
-						row.querySelector('.atg-sounding').innerText =
-							(isEnabled && s.sounding_mm != null) ? s.sounding_mm.toFixed(1) : '—';
+						row.querySelector('.atg-offset-fuel').innerText =
+							isEnabled ? s.offset_fuel_mm.toFixed(1) : '—';
+						row.querySelector('.atg-fuel').innerText =
+							(isEnabled && s.fuel_mm != null) ? s.fuel_mm.toFixed(1) : '—';
+						row.querySelector('.atg-sounding-fuel').innerText =
+							(isEnabled && s.sounding_fuel_mm != null) ? s.sounding_fuel_mm.toFixed(1) : '—';
 						const volCell = row.querySelector('.atg-volume');
 						if (isEnabled && s.volume != null) {
 							volCell.innerText = s.volume.toFixed(1);
 						} else {
 							volCell.innerText = '—';
 						}
+						row.querySelector('.atg-offset-water').innerText =
+							isEnabled ? s.offset_water_mm.toFixed(1) : '—';
 						row.querySelector('.atg-water').innerText =
 							(isEnabled && s.water_mm != null) ? s.water_mm.toFixed(1) : '—';
+						row.querySelector('.atg-sounding-water').innerText =
+							(isEnabled && s.sounding_water_mm != null) ? s.sounding_water_mm.toFixed(1) : '—';
 						row.querySelector('.atg-volume-water').innerText =
 							(isEnabled && s.volume_water_l != null) ? s.volume_water_l.toFixed(1) : '—';
-						row.querySelector('.atg-volume-total').innerText =
-							(isEnabled && s.volume_total_l != null) ? s.volume_total_l.toFixed(1) : '—';
 						row.querySelector('.atg-temp').innerText =
 							(isEnabled && s.fuel_temp_c != null) ? s.fuel_temp_c.toFixed(1) : '—';
 						row.querySelector('.atg-updated').innerText = s.updated_at || '—';

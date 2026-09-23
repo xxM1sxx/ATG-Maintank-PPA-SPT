@@ -413,6 +413,7 @@ if (isset($_POST['save_atg_sensors'])) {
 			$de_gpio = intval(isset($_POST["atg_de_gpio_$i"]) ? $_POST["atg_de_gpio_$i"] : -1);
 			$timeout = intval(isset($_POST["atg_timeout_$i"]) ? $_POST["atg_timeout_$i"] : 3000);
 			$offset_mm = floatval(isset($_POST["atg_offset_mm_$i"]) ? $_POST["atg_offset_mm_$i"] : 0);
+			$offset_mm_water = floatval(isset($_POST["atg_offset_mm_water_$i"]) ? $_POST["atg_offset_mm_water_$i"] : 0);
 
 			if ($polling < 500) $polling = 500;
 			if ($timeout < 500) $timeout = 500;
@@ -427,6 +428,7 @@ if (isset($_POST['save_atg_sensors'])) {
 						de_gpio_pin = :de_gpio,
 						read_timeout_ms = :timeout,
 						offset_mm = :offset_mm,
+						offset_mm_water = :offset_mm_water,
 						zero_offset_mm = 0
 					  WHERE id = :id";
 			$stmt = $conn->prepare($query);
@@ -439,6 +441,7 @@ if (isset($_POST['save_atg_sensors'])) {
 			$stmt->bindValue(':de_gpio', $de_gpio, PDO::PARAM_INT);
 			$stmt->bindValue(':timeout', $timeout, PDO::PARAM_INT);
 			$stmt->bindValue(':offset_mm', $offset_mm);
+			$stmt->bindValue(':offset_mm_water', $offset_mm_water);
 			$stmt->bindValue(':id', $i, PDO::PARAM_INT);
 			$stmt->execute();
 		}

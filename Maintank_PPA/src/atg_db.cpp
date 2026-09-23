@@ -84,6 +84,22 @@ double AtgDatabase::load_offset_mm(int sensor_id) {
     return offset;
 }
 
+double AtgDatabase::load_offset_mm_water(int sensor_id) {
+    if (!db_) return 0;
+
+    const char* sql = "SELECT offset_mm_water FROM tbl_atg_sensor WHERE id=?";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK)
+        return 0;
+
+    sqlite3_bind_int(stmt, 1, sensor_id);
+    double offset = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+        offset = sqlite3_column_double(stmt, 0);
+    sqlite3_finalize(stmt);
+    return offset;
+}
+
 std::vector<VolumePoint> AtgDatabase::load_volume_points(int sensor_id) {
     std::vector<VolumePoint> points;
     if (!db_) return points;
@@ -111,20 +127,20 @@ void AtgDatabase::upsert_reading(int sensor_id, const atg::SensorResult& r) {
     if (!db_) return;
 
     const char* sql =
-        "INSERT INTO tbl_atg_reading (sensor_id, position_mm, volume, water_mm, fuel_temp_c, offset, ok, error_msg, updated_at, volume_water_l, volume_total_l) "
+        "INSERT INTO tbl_atg_reading (sensor_id, position_mm, volume, water_mm, fuel_temp_c, offset, offset_water, ok, error_msg, updated_at, volume_water_l) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
         "ON CONFLICT(sensor_id) DO UPDATE SET "
         "position_mm=excluded.position_mm, volume=excluded.volume, "
         "water_mm=excluded.water_mm, fuel_temp_c=excluded.fuel_temp_c, "
-        "offset=excluded.offset, "
+        "offset=excluded.offset, offset_water=excluded.offset_water, "
         "ok=excluded.ok, error_msg=excluded.error_msg, updated_at=excluded.updated_at, "
-        "volume_water_l=excluded.volume_water_l, volume_total_l=excluded.volume_total_l";
+        "volume_water_l=excluded.volume_water_l";
 
     sqlite3_stmt* stmt = nullptr;
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return;
 
     double probe_mm = 0.0, volume_fuel = 0.0, water_mm = 0.0, fuel_temp_c = 0.0;
-    double offset_mm = 0.0, volume_water = 0.0, volume_total = 0.0;
+    double offset_mm = 0.0, offset_mm_water = 0.0, volume_water = 0.0;
     bool volume_valid = false;
     bool has_probe = false;
     if (r.ok && !r.readings.empty()) {
@@ -134,30 +150,23 @@ void AtgDatabase::upsert_reading(int sensor_id, const atg::SensorResult& r) {
         fuel_temp_c = t.fuel_temp_c;
         has_probe = true;
         offset_mm = load_offset_mm(sensor_id);
+        offset_mm_water = load_offset_mm_water(sensor_id);
         const auto points = load_volume_points(sensor_id);
 
-        // The probe's "fuel level" float rides on top of everything, so
-        // probe_mm is actually the TOTAL liquid sounding (fuel + water layer
-        // underneath it), not fuel alone - the strapping/tera table is purely
-        // geometric (height -> volume for the tank shape), so it's looked up
-        // separately for the total sounding and for the water layer alone,
-        // then the volumes (not the heights) are subtracted to get fuel-only
-        // volume. Subtracting heights first would be wrong: volume-per-mm is
-        // non-linear (tank cross-section varies with height).
-        const double vt = lookup_volume_liters(probe_mm, offset_mm, points);
-        const double vw = lookup_volume_liters(water_mm, offset_mm, points);
-        if (vt >= 0 && vw >= 0) {
-            volume_total = vt;
+        // Fuel and water are each looked up independently against the same
+        // strapping/tera table (height -> volume for the tank shape), each with
+        // its own calibration offset - no total-sounding subtraction anymore.
+        const double vf = lookup_volume_liters(probe_mm, offset_mm, points);
+        const double vw = lookup_volume_liters(water_mm, offset_mm_water, points);
+        if (vf >= 0 && vw >= 0) {
+            volume_fuel = vf;
             volume_water = vw;
-            volume_fuel = vt - vw;
-            if (volume_fuel < 0) volume_fuel = 0;  // clamp rounding/noise
             volume_valid = true;
         }
         atg::atg_log(atg::LogLevel::Info, "ATG",
-            "volume lookup sensor=%d probe=%.1fmm water=%.1fmm offset=%.1fmm points=%zu -> total=%.1fL water=%.1fL fuel=%.1fL",
-            sensor_id, probe_mm, water_mm, offset_mm, points.size(),
-            volume_valid ? volume_total : -1.0, volume_valid ? volume_water : -1.0,
-            volume_valid ? volume_fuel : -1.0);
+            "volume lookup sensor=%d probe=%.1fmm offset=%.1fmm water=%.1fmm offset_water=%.1fmm points=%zu -> fuel=%.1fL water=%.1fL",
+            sensor_id, probe_mm, offset_mm, water_mm, offset_mm_water, points.size(),
+            volume_valid ? volume_fuel : -1.0, volume_valid ? volume_water : -1.0);
     }
 
     sqlite3_bind_int(stmt, 1, sensor_id);
@@ -170,25 +179,24 @@ void AtgDatabase::upsert_reading(int sensor_id, const atg::SensorResult& r) {
         sqlite3_bind_double(stmt, 4, water_mm);
         sqlite3_bind_double(stmt, 5, fuel_temp_c);
         sqlite3_bind_double(stmt, 6, offset_mm);
+        sqlite3_bind_double(stmt, 7, offset_mm_water);
     } else {
         sqlite3_bind_null(stmt, 4);
         sqlite3_bind_null(stmt, 5);
         sqlite3_bind_null(stmt, 6);
+        sqlite3_bind_null(stmt, 7);
     }
-    sqlite3_bind_int(stmt, 7, r.ok ? 1 : 0);
+    sqlite3_bind_int(stmt, 8, r.ok ? 1 : 0);
     if (r.ok)
-        sqlite3_bind_null(stmt, 8);
+        sqlite3_bind_null(stmt, 9);
     else
-        sqlite3_bind_text(stmt, 8, r.error.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 9, r.error.c_str(), -1, SQLITE_TRANSIENT);
     std::string ts = iso_timestamp();
-    sqlite3_bind_text(stmt, 9, ts.c_str(), -1, SQLITE_TRANSIENT);
-    if (volume_valid) {
-        sqlite3_bind_double(stmt, 10, volume_water);
-        sqlite3_bind_double(stmt, 11, volume_total);
-    } else {
-        sqlite3_bind_null(stmt, 10);
+    sqlite3_bind_text(stmt, 10, ts.c_str(), -1, SQLITE_TRANSIENT);
+    if (volume_valid)
+        sqlite3_bind_double(stmt, 11, volume_water);
+    else
         sqlite3_bind_null(stmt, 11);
-    }
 
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
@@ -241,18 +249,14 @@ std::vector<SensorData> AtgDatabase::load_sensor_data_for_mqtt() {
     // Modbus read (r.ok=0) must never be published as if it were a real 0 L /
     // 0 mm reading, to either the local or cloud MQTT topic (both share this query).
     //
-    // MQTT intentionally uses r.volume_total_l (TeraTable(fuel_level_mm) directly,
-    // no water subtraction) rather than r.volume (the fuel-only corrected value) -
-    // this preserves the original/legacy MQTT payload shape. The fuel/water
-    // breakdown is only surfaced in the web UI (get_atg_readings.php), not here.
+    // MQTT uses r.volume (the fuel-only volume, water already subtracted) so the
+    // published volume_l matches Fuel Vol on the web UI, not Total Vol.
     //
     // fuel_level_mm reported here = position_mm + offset (the actual "sounding"
-    // height used to compute volume_total_l), not the raw probe reading - so the
-    // two fields stay consistent with each other (volume_l corresponds exactly
-    // to the fuel_level_mm sent alongside it).
+    // height), not the raw probe reading.
     const char* sql =
         "SELECT s.id, s.slocn, s.sensor_number, s.capacity_liters, "
-        "       r.position_mm, r.volume_total_l, r.fuel_temp_c, r.offset "
+        "       r.position_mm, r.volume, r.fuel_temp_c, r.offset "
         "FROM tbl_atg_sensor s "
         "JOIN tbl_atg_reading r ON s.id = r.sensor_id "
         "WHERE s.enabled=1 AND r.ok=1 ORDER BY s.id";
