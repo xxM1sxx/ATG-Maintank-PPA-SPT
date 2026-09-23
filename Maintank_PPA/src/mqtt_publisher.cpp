@@ -543,6 +543,7 @@ std::string MqttPublisher::build_sensor_data_array(const std::vector<SensorData>
         ss << "{"
            << "\"slocn\":\"" << sensor.slocn << "\","
            << "\"number\":\"" << sensor.number << "\","
+           << "\"status\":" << sensor.status << ","
            << "\"capacity_l\":" << static_cast<long>(sensor.capacity_l) << ","
            << "\"fuel_level_mm\":" << static_cast<long>(sensor.fuel_level_mm) << ","
            << "\"volume_l\":" << static_cast<long>(sensor.volume_l) << ","

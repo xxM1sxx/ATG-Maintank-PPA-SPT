@@ -245,9 +245,11 @@ std::vector<SensorData> AtgDatabase::load_sensor_data_for_mqtt() {
     std::vector<SensorData> sensors;
     if (!db_) return sensors;
 
-    // Only include sensors with a successful, non-null last reading - a failed
-    // Modbus read (r.ok=0) must never be published as if it were a real 0 L /
-    // 0 mm reading, to either the local or cloud MQTT topic (both share this query).
+    // Every enabled sensor is always published, even with no reading yet or a
+    // failed Modbus read (r.ok=0/NULL) - status=0 marks those, with all values
+    // zeroed, instead of being silently omitted from the payload. Disabled
+    // sensors (unchecked in ATG Sensor Configuration) are excluded entirely -
+    // they don't exist as far as MQTT consumers are concerned.
     //
     // MQTT uses r.volume (the fuel-only volume, water already subtracted) so the
     // published volume_l matches Fuel Vol on the web UI, not Total Vol.
@@ -256,10 +258,10 @@ std::vector<SensorData> AtgDatabase::load_sensor_data_for_mqtt() {
     // height), not the raw probe reading.
     const char* sql =
         "SELECT s.id, s.slocn, s.sensor_number, s.capacity_liters, "
-        "       r.position_mm, r.volume, r.fuel_temp_c, r.offset "
+        "       r.position_mm, r.volume, r.fuel_temp_c, r.offset, r.ok "
         "FROM tbl_atg_sensor s "
-        "JOIN tbl_atg_reading r ON s.id = r.sensor_id "
-        "WHERE s.enabled=1 AND r.ok=1 ORDER BY s.id";
+        "LEFT JOIN tbl_atg_reading r ON s.id = r.sensor_id "
+        "WHERE s.enabled=1 ORDER BY s.id";
 
     sqlite3_stmt* stmt = nullptr;
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK)
@@ -274,13 +276,22 @@ std::vector<SensorData> AtgDatabase::load_sensor_data_for_mqtt() {
         const char* number = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
         data.number = number ? number : "";
 
-        double position_mm = sqlite3_column_double(stmt, 4);
-        double offset_mm = sqlite3_column_double(stmt, 7);
-
         data.capacity_l = sqlite3_column_double(stmt, 3);
-        data.fuel_level_mm = position_mm + offset_mm;
-        data.volume_l = sqlite3_column_double(stmt, 5);
-        data.temperature_c = sqlite3_column_double(stmt, 6);
+
+        const bool ok = sqlite3_column_type(stmt, 8) != SQLITE_NULL && sqlite3_column_int(stmt, 8) != 0;
+        data.status = ok ? 1 : 0;
+
+        if (ok) {
+            double position_mm = sqlite3_column_double(stmt, 4);
+            double offset_mm = sqlite3_column_double(stmt, 7);
+            data.fuel_level_mm = position_mm + offset_mm;
+            data.volume_l = sqlite3_column_double(stmt, 5);
+            data.temperature_c = sqlite3_column_double(stmt, 6);
+        } else {
+            data.fuel_level_mm = 0.0;
+            data.volume_l = 0.0;
+            data.temperature_c = 0.0;
+        }
 
         sensors.push_back(data);
     }

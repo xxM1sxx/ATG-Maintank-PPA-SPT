@@ -57,6 +57,8 @@ struct SensorData {
                              // web UI (tbl_atg_reading.volume). Water Vol / Total Vol are not sent
                              // over MQTT.
     double temperature_c;
+    int status = 0;         // 1 = last Modbus read OK (values below are real); 0 = no reading yet
+                             // or last read failed (fuel_level_mm/volume_l/temperature_c are 0)
 };
 
 class MqttPublisher {
