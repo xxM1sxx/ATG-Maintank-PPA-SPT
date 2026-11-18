@@ -1,0 +1,18 @@
+[Unit]
+Description=ATG interval responder (protokol atg_mqtt_sub -> tbl_atg_mqtt_setting)
+After=network-online.target mosquitto.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/user/Apps/bin/atg-interval-responder --db /home/user/Apps/qims_logger.db --target cloud
+# Ganti ke 127.0.0.1 lain / broker berbeda kalau perlu:
+#   --host 127.0.0.1 --port 1883 --user admin --pass '...'
+# Interval lokal (topic maintank/atg/value) ikut diubah hanya dengan --target both.
+Restart=always
+RestartSec=5
+# ATG_DEBUG=0 menyembunyikan log INFO, WARN/ERROR tetap keluar.
+#Environment=ATG_DEBUG=0
+
+[Install]
+WantedBy=multi-user.target
