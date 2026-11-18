@@ -42,6 +42,10 @@ public:
     void trim_pending_cloud_rows(int cap);
     int count_pending_cloud_rows();
 
+    // Interval saja, untuk reload tanpa restart (main loop, tiap 5 detik).
+    // Nilai <1 dari DB di-clamp ke 1 supaya gate publish tidak jadi tiap tick.
+    bool load_publish_intervals(int& local_sec, int& cloud_sec);
+
 private:
     double load_offset_mm(int sensor_id);
     double load_offset_mm_water(int sensor_id);

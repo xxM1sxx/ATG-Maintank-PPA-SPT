@@ -72,6 +72,10 @@ public:
     void update();
     void publish_telemetry(const std::vector<SensorData>& sensors);
 
+    // Terapkan interval baru tanpa restart. Broker/topik/enabled tetap hanya
+    // dibaca saat init(), karena mengubahnya butuh reconnect + resubscribe.
+    void set_intervals(int local_interval_sec, int cloud_interval_sec);
+
     // Cloud path: gated by cloud_config_.publish_interval_sec, tags the payload with
     // a message_id, and waits for the downstream controller's application-level ack
     // (see CloudMqttConfig comment). On timeout/explicit failure, parks the payload

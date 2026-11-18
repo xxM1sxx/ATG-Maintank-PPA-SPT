@@ -384,11 +384,21 @@ Or via the web UI: Settings → **Download** tab shows the same data with a
 | Enable Cloud MQTT | `cloud_enabled` | off | Gates topics #2 and #3 entirely |
 | Save to database when ACK fails | `cloud_store_on_fail` | on | If off, failed cloud publishes are dropped, not queued |
 
-Ack timeout (10s) and replay batch size (50)/pacing (5s) are currently fixed
-in firmware, not web-configurable.
+Ack timeout (10s) and replay batch size (50) are currently fixed in firmware,
+not web-configurable.
 
-Changing any of these requires the `atg-reader` service to restart to take
-effect (config is loaded once at startup):
+The two publish intervals (**Local Publish Interval**, **Cloud Publish
+Interval**) are re-read from `tbl_atg_mqtt_setting` every 5 seconds by the main
+loop, so changing them in the web UI takes effect within ~5s with **no
+restart** — logged when applied:
+
+```
+[INFO] [MQTT-CLOUD] cloud publish interval 120 -> 5s (live)
+```
+
+Everything else (broker host/port, credentials, topic paths, `enabled` /
+`cloud_enabled`, `cloud_store_on_fail`) is still loaded once at startup and
+requires a restart, because it needs a reconnect/resubscribe:
 
 ```bash
 sudo systemctl restart atg-reader

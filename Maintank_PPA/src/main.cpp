@@ -69,9 +69,28 @@ int main(int argc, char* argv[]) {
 
         auto last_publish = std::chrono::steady_clock::now();
         auto last_mem_check = std::chrono::steady_clock::now();
+        auto last_cfg_check = std::chrono::steady_clock::now();
 
         while (g_running) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            // Interval MQTT bisa diubah dari web; baca ulang tiap 5 detik supaya
+            // berlaku tanpa restart. Broker/topik/enabled tetap butuh restart.
+            {
+                auto now = std::chrono::steady_clock::now();
+                if (std::chrono::duration_cast<std::chrono::seconds>(now - last_cfg_check).count() >= 5) {
+                    last_cfg_check = now;
+                    int local_sec = mqtt_config.publish_interval_sec;
+                    int cloud_sec = cloud_config.publish_interval_sec;
+                    if (db.load_publish_intervals(local_sec, cloud_sec) &&
+                        (local_sec != mqtt_config.publish_interval_sec ||
+                         cloud_sec != cloud_config.publish_interval_sec)) {
+                        mqtt_config.publish_interval_sec = local_sec;
+                        cloud_config.publish_interval_sec = cloud_sec;
+                        publisher.set_intervals(local_sec, cloud_sec);
+                    }
+                }
+            }
 
             if (mqtt_config.enabled) {
                 auto now = std::chrono::steady_clock::now();

@@ -424,4 +424,27 @@ void AtgDatabase::trim_pending_cloud_rows(int cap) {
     sqlite3_finalize(stmt);
 }
 
+bool AtgDatabase::load_publish_intervals(int& local_sec, int& cloud_sec) {
+    if (!db_) return false;
+
+    const char* sql = "SELECT publish_interval_sec, cloud_publish_interval_sec "
+                      "FROM tbl_atg_mqtt_setting WHERE id=1";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        return false;
+    }
+
+    bool found = false;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        local_sec = sqlite3_column_int(stmt, 0);
+        cloud_sec = sqlite3_column_int(stmt, 1);
+        if (local_sec < 1) local_sec = 1;
+        if (cloud_sec < 1) cloud_sec = 1;
+        found = true;
+    }
+
+    sqlite3_finalize(stmt);
+    return found;
+}
+
 } // namespace atg_app

@@ -208,6 +208,21 @@ void MqttPublisher::update() {
     }
 }
 
+void MqttPublisher::set_intervals(int local_interval_sec, int cloud_interval_sec) {
+    // Dipanggil dari main thread, sama seperti publish_*() yang membacanya -
+    // jadi tidak perlu publish_mutex_ (hanya dipakai saat publish/subscribe).
+    if (local_interval_sec != config_.publish_interval_sec) {
+        atg::atg_log(atg::LogLevel::Info, "MQTT", "local publish interval %d -> %ds (live)",
+                     config_.publish_interval_sec, local_interval_sec);
+        config_.publish_interval_sec = local_interval_sec;
+    }
+    if (cloud_interval_sec != cloud_config_.publish_interval_sec) {
+        atg::atg_log(atg::LogLevel::Info, "MQTT-CLOUD", "cloud publish interval %d -> %ds (live)",
+                     cloud_config_.publish_interval_sec, cloud_interval_sec);
+        cloud_config_.publish_interval_sec = cloud_interval_sec;
+    }
+}
+
 void MqttPublisher::publish_telemetry(const std::vector<SensorData>& sensors) {
     if (!config_.enabled || !mosq_) {
         return;
