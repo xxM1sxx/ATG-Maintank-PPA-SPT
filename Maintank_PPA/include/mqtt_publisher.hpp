@@ -53,9 +53,8 @@ struct SensorData {
     std::string number;
     double capacity_l;
     double fuel_level_mm;
-    double volume_l;        // fuel-only volume (water already subtracted), matches Fuel Vol on the
-                             // web UI (tbl_atg_reading.volume). Water Vol / Total Vol are not sent
-                             // over MQTT.
+    double volume_l;        // tbl_atg_reading.volume: lookup of fuel_level_mm (+offset), no water
+                             // subtraction. Water volume is not sent over MQTT.
     double temperature_c;
     int status = 0;         // 1 = last Modbus read OK (values below are real); 0 = no reading yet
                              // or last read failed (fuel_level_mm/volume_l/temperature_c are 0)
@@ -102,8 +101,6 @@ private:
         std::chrono::steady_clock::time_point sent_at;
         std::string json_payload;
         std::vector<int64_t> row_ids;  // empty = live telemetry; non-empty = replay batch
-        bool resolved = false;         // an explicit ack (success or failure) arrived
-        bool success = false;          // only meaningful when resolved
     };
 
     MqttConfig config_;
@@ -126,8 +123,8 @@ private:
     bool do_cloud_publish(const std::string& message_id, const std::string& json,
                           const std::vector<int64_t>& row_ids_on_success_delete,
                           const std::string& topic);
-    bool wait_for_ack(const std::string& message_id, std::chrono::seconds timeout);
     void run_replay_drain();
+    void subscribe_cloud_topics();  // called on every (re)connect
     void handle_ack_payload(const std::string& payload);
 };
 

@@ -251,8 +251,8 @@ std::vector<SensorData> AtgDatabase::load_sensor_data_for_mqtt() {
     // sensors (unchecked in ATG Sensor Configuration) are excluded entirely -
     // they don't exist as far as MQTT consumers are concerned.
     //
-    // MQTT uses r.volume (the fuel-only volume, water already subtracted) so the
-    // published volume_l matches Fuel Vol on the web UI, not Total Vol.
+    // MQTT uses r.volume: the strapping-table lookup of the probe fuel level + offset,
+    // with no water subtraction. Water volume (volume_water_l) is not sent over MQTT.
     //
     // fuel_level_mm reported here = position_mm + offset (the actual "sounding"
     // height), not the raw probe reading.

@@ -153,31 +153,8 @@ bool MqttPublisher::init() {
         return false;
     }
 
-    if (cloud_config_.enabled) {
-        // Subscribe to the data topic too - the downstream controller that actually
-        // pushes to the cloud publishes its success/failure ack back on this same
-        // topic, so we must be a subscriber to receive it (not just a publisher).
-        if (!cloud_config_.data_topic.empty()) {
-            int sub_result = mosquitto_subscribe(mosq_, nullptr, cloud_config_.data_topic.c_str(), 1);
-            if (sub_result != MOSQ_ERR_SUCCESS) {
-                atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD", "Subscribe to data topic=%s failed: %s",
-                             cloud_config_.data_topic.c_str(), mosquitto_strerror(sub_result));
-            } else {
-                atg::atg_log(atg::LogLevel::Info, "MQTT-CLOUD", "Subscribed to data topic=%s (for ack replies)",
-                             cloud_config_.data_topic.c_str());
-            }
-        }
-        if (!cloud_config_.request_topic.empty()) {
-            int sub_result = mosquitto_subscribe(mosq_, nullptr, cloud_config_.request_topic.c_str(), 1);
-            if (sub_result != MOSQ_ERR_SUCCESS) {
-                atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD", "Subscribe to request topic=%s failed: %s",
-                             cloud_config_.request_topic.c_str(), mosquitto_strerror(sub_result));
-            } else {
-                atg::atg_log(atg::LogLevel::Info, "MQTT-CLOUD", "Subscribed to request topic=%s",
-                             cloud_config_.request_topic.c_str());
-            }
-        }
-    }
+    // Cloud topic subscriptions happen in on_connect_impl(): the session is clean
+    // (mosquitto_new(..., true, ...)), so the broker forgets them on every reconnect.
 
     atg::atg_log(atg::LogLevel::Info, "MQTT", "Initialized: %s:%d local_topic=%s local_enabled=%d",
                        config_.broker_host.c_str(), config_.broker_port, config_.topic_path.c_str(),
@@ -301,8 +278,6 @@ bool MqttPublisher::do_cloud_publish(const std::string& message_id, const std::s
     pa.sent_at = std::chrono::steady_clock::now();
     pa.json_payload = json;
     pa.row_ids = row_ids;
-    pa.resolved = false;
-    pa.success = false;
     pending_acks_[message_id] = pa;
     return true;
 }
@@ -311,27 +286,13 @@ void MqttPublisher::check_ack_timeouts() {
     if (!cloud_config_.enabled) return;
 
     auto now = std::chrono::steady_clock::now();
-    std::vector<PendingAck> silently_timed_out;
+    std::vector<PendingAck> timed_out;
     {
         std::lock_guard<std::mutex> lock(publish_mutex_);
         for (auto it = pending_acks_.begin(); it != pending_acks_.end(); ) {
-            // Replay batches are actively polled (and erased) by wait_for_ack() on
-            // the main thread, including once resolved - leave those alone here.
-            if (!it->second.row_ids.empty()) {
-                ++it;
-                continue;
-            }
-
-            if (it->second.resolved) {
-                // Explicit success already handled at the point of the ack (see
-                // on_message_impl); nothing more to do, just drop the bookkeeping.
-                it = pending_acks_.erase(it);
-                continue;
-            }
-
             auto age = std::chrono::duration_cast<std::chrono::seconds>(now - it->second.sent_at).count();
             if (age >= kCloudAckTimeoutSec) {
-                silently_timed_out.push_back(std::move(it->second));
+                timed_out.push_back(std::move(it->second));
                 it = pending_acks_.erase(it);
             } else {
                 ++it;
@@ -339,9 +300,14 @@ void MqttPublisher::check_ack_timeouts() {
         }
     }
 
-    for (auto& pa : silently_timed_out) {
+    for (auto& pa : timed_out) {
         // No ack at all (success or failure) arrived within the window.
-        if (cloud_config_.store_on_fail) {
+        if (!pa.row_ids.empty()) {
+            // Replay batch: rows were never deleted, they stay queued for the next get_pending.
+            atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD",
+                "Replay batch: ack timed out (no reply within %ds), %zu rows stay queued (not deleted)",
+                kCloudAckTimeoutSec, pa.row_ids.size());
+        } else if (cloud_config_.store_on_fail) {
             atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD",
                 "Telemetry ack timeout (no reply within %ds) -> stored to pending queue (bytes=%zu)",
                 kCloudAckTimeoutSec, pa.json_payload.size());
@@ -354,29 +320,6 @@ void MqttPublisher::check_ack_timeouts() {
     }
 }
 
-bool MqttPublisher::wait_for_ack(const std::string& message_id, std::chrono::seconds timeout) {
-    auto deadline = std::chrono::steady_clock::now() + timeout;
-    while (std::chrono::steady_clock::now() < deadline) {
-        {
-            std::lock_guard<std::mutex> lock(publish_mutex_);
-            auto it = pending_acks_.find(message_id);
-            if (it == pending_acks_.end()) {
-                return false;  // shouldn't normally happen; treat as failure
-            }
-            if (it->second.resolved) {
-                bool ok = it->second.success;
-                pending_acks_.erase(it);
-                return ok;
-            }
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-    // No explicit ack at all within the window - clean up, treat as failure.
-    std::lock_guard<std::mutex> lock(publish_mutex_);
-    pending_acks_.erase(message_id);
-    return false;
-}
-
 void MqttPublisher::poll_replay_request() {
     if (!cloud_config_.enabled || !db_) return;
     if (replay_requested_.exchange(false)) {
@@ -385,6 +328,20 @@ void MqttPublisher::poll_replay_request() {
 }
 
 void MqttPublisher::run_replay_drain() {
+    // The batch's ack is handled asynchronously (handle_ack_payload deletes the rows,
+    // check_ack_timeouts gives up) so this never blocks the main loop. Only one batch
+    // may be in flight, otherwise the same oldest-50 rows would be sent twice.
+    {
+        std::lock_guard<std::mutex> lock(publish_mutex_);
+        for (const auto& kv : pending_acks_) {
+            if (!kv.second.row_ids.empty()) {
+                atg::atg_log(atg::LogLevel::Info, "MQTT-CLOUD",
+                    "Replay request ignored: previous batch still awaiting ack");
+                return;
+            }
+        }
+    }
+
     // One request = one batch of up to 50 (oldest first). No auto-continue - if
     // more than 50 rows are pending, the downstream controller is expected to
     // send another {"command":"get_pending"} request to get the next batch.
@@ -413,20 +370,7 @@ void MqttPublisher::run_replay_drain() {
     std::string batch_json = build_batch_json(payloads, message_id);
     if (!do_cloud_publish(message_id, batch_json, ids, cloud_config_.request_topic)) {
         atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD", "Replay batch: publish call failed, rows stay queued");
-        return;
     }
-
-    bool acked = wait_for_ack(message_id, std::chrono::seconds(kCloudAckTimeoutSec));
-    if (!acked) {
-        atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD",
-            "Replay batch: ack FAILED or timed out, %zu rows stay queued (not deleted)", ids.size());
-        return;
-    }
-
-    db_->delete_pending_cloud_rows(ids);
-    atg::atg_log(atg::LogLevel::Info, "MQTT-CLOUD",
-        "Replay batch: ack OK, %zu rows delivered and removed from queue (%d rows still pending)",
-        ids.size(), pending_before - static_cast<int>(ids.size()));
 }
 
 bool MqttPublisher::is_connected() const {
@@ -448,10 +392,33 @@ void MqttPublisher::close() {
     atg::atg_log(atg::LogLevel::Info, "MQTT", "Closed");
 }
 
+void MqttPublisher::subscribe_cloud_topics() {
+    if (!cloud_config_.enabled || !mosq_) return;
+
+    // The downstream controller publishes its ack on the same topic we publish to,
+    // so we must be a subscriber on both to receive acks and get_pending requests.
+    const std::pair<const char*, const std::string*> topics[] = {
+        {"data", &cloud_config_.data_topic},
+        {"request", &cloud_config_.request_topic},
+    };
+    for (const auto& t : topics) {
+        if (t.second->empty()) continue;
+        int rc = mosquitto_subscribe(mosq_, nullptr, t.second->c_str(), 1);
+        if (rc != MOSQ_ERR_SUCCESS) {
+            atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD", "Subscribe to %s topic=%s failed: %s",
+                         t.first, t.second->c_str(), mosquitto_strerror(rc));
+        } else {
+            atg::atg_log(atg::LogLevel::Info, "MQTT-CLOUD", "Subscribed to %s topic=%s",
+                         t.first, t.second->c_str());
+        }
+    }
+}
+
 void MqttPublisher::on_connect_impl(int reason_code) {
     if (reason_code == 0) {
         connected_ = true;
         atg::atg_log(atg::LogLevel::Info, "MQTT", "Connected to broker");
+        subscribe_cloud_topics();
     } else {
         connected_ = false;
         atg::atg_log(atg::LogLevel::Error, "MQTT", "Connection failed: %s", mosquitto_connack_string(reason_code));
@@ -504,47 +471,47 @@ void MqttPublisher::handle_ack_payload(const std::string& payload) {
         return;
     }
 
-    std::lock_guard<std::mutex> lock(publish_mutex_);
-    auto it = pending_acks_.find(message_id);
-    if (it == pending_acks_.end()) {
-        atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD",
-            "Ack received for unknown/expired message_id=%s status=%s", message_id.c_str(), status.c_str());
-        return;
+    // Take the entry out under the lock, then do the DB work outside it so a busy
+    // SQLite doesn't hold publish_mutex_ (and with it the main thread's publishes).
+    PendingAck pa;
+    {
+        std::lock_guard<std::mutex> lock(publish_mutex_);
+        auto it = pending_acks_.find(message_id);
+        if (it == pending_acks_.end()) {
+            atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD",
+                "Ack received for unknown/expired message_id=%s status=%s", message_id.c_str(), status.c_str());
+            return;
+        }
+        pa = std::move(it->second);
+        pending_acks_.erase(it);
     }
 
-    const bool is_batch = !it->second.row_ids.empty();
+    const bool is_batch = !pa.row_ids.empty();
     auto rtt_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - it->second.sent_at).count();
+        std::chrono::steady_clock::now() - pa.sent_at).count();
 
     if (status == "success") {
         atg::atg_log(atg::LogLevel::Info, "MQTT-CLOUD",
             "Ack SUCCESS message_id=%s (%s) rtt=%lldms", message_id.c_str(),
             is_batch ? "replay batch" : "telemetry", (long long)rtt_ms);
-        if (is_batch) {
-            // wait_for_ack() (on the main thread, inside run_replay_drain) is
-            // actively polling for this - leave it resolved for that to consume
-            // and erase, so it can also trigger the row deletion.
-            it->second.resolved = true;
-            it->second.success = true;
-        } else {
-            // Nothing else needs this telemetry entry - drop it now.
-            pending_acks_.erase(it);
+        if (is_batch && db_) {
+            db_->delete_pending_cloud_rows(pa.row_ids);
+            atg::atg_log(atg::LogLevel::Info, "MQTT-CLOUD",
+                "Replay batch: ack OK, %zu rows delivered and removed from queue (%d rows still pending)",
+                pa.row_ids.size(), db_->count_pending_cloud_rows());
         }
-    } else {
+        return;
+    }
+
+    atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD",
+        "Ack FAILED message_id=%s status=%s (%s) rtt=%lldms", message_id.c_str(), status.c_str(),
+        is_batch ? "replay batch" : "telemetry", (long long)rtt_ms);
+    if (is_batch) {
         atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD",
-            "Ack FAILED message_id=%s status=%s (%s) rtt=%lldms", message_id.c_str(), status.c_str(),
-            is_batch ? "replay batch" : "telemetry", (long long)rtt_ms);
-        if (is_batch) {
-            // Let wait_for_ack() notice promptly instead of waiting out the full timeout.
-            it->second.resolved = true;
-            it->second.success = false;
-        } else {
-            if (cloud_config_.store_on_fail) {
-                if (db_) db_->insert_pending_cloud_row(it->second.json_payload);
-                atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD", "Stored to pending queue (explicit failure ack)");
-            }
-            pending_acks_.erase(it);
-        }
+            "Replay batch: ack FAILED, %zu rows stay queued (not deleted)", pa.row_ids.size());
+    } else if (cloud_config_.store_on_fail) {
+        if (db_) db_->insert_pending_cloud_row(pa.json_payload);
+        atg::atg_log(atg::LogLevel::Warn, "MQTT-CLOUD", "Stored to pending queue (explicit failure ack)");
     }
 }
 

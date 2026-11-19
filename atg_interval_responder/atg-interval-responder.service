@@ -5,8 +5,8 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/home/user/Apps/bin/atg-interval-responder --db /home/user/Apps/qims_logger.db --target cloud
-# Ganti ke 127.0.0.1 lain / broker berbeda kalau perlu:
+ExecStart=/home/user/Apps/bin/atg-interval-responder --db /home/user/Apps/qims_logger.db --host 192.168.1.18 --target cloud
+# Broker 192.168.1.18:1883, user/pass memakai default di source (admin). Kalau berbeda:
 #   --host 127.0.0.1 --port 1883 --user admin --pass '...'
 # Interval lokal (topic maintank/atg/value) ikut diubah hanya dengan --target both.
 Restart=always

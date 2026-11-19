@@ -64,6 +64,7 @@ Request/Replay Topic.
     {
       "slocn": "FS-01",
       "number": "01",
+      "status": 1,
       "capacity_l": 40000,
       "fuel_level_mm": 2500,
       "volume_l": 30000,
@@ -74,10 +75,12 @@ Request/Replay Topic.
 }
 ```
 
-A sensor is **only** included if its last Modbus read succeeded (`ok=1` in
-`tbl_atg_reading`). A failed read is never sent as if it were a real 0 mm /
-0 L reading — it's just omitted from `data[]` until the next successful read.
-This filtering applies to the Cloud Data Topic too (same underlying query).
+Every **enabled** sensor is always included in `data[]`. `status` is `1` when its
+last Modbus read succeeded (`ok=1` in `tbl_atg_reading`), and `0` when there is
+no reading yet or the last read failed — in that case `fuel_level_mm`,
+`volume_l` and `temperature_c` are sent as `0`, so consumers must check
+`status` before trusting the values. Disabled sensors are left out entirely.
+This applies to the Cloud Data Topic too (same underlying query).
 
 **`volume_l` is total liquid volume** (`TeraTable(fuel_level_mm)` looked up
 directly, no water subtraction) — this is the original/legacy MQTT field
@@ -92,11 +95,10 @@ computed from. Reporting the raw value here while `volume_l` was computed
 from the offset-adjusted height would make the two fields inconsistent with
 each other.
 
-A separate fuel/water breakdown (fuel-only volume, water-layer volume, and
-this same total) **is** computed and stored per reading
-(`tbl_atg_reading.volume` / `volume_water_l` / `volume_total_l`), but is only
-surfaced in the **web UI** (Status → Fuel Level Sensors: "Fuel Vol (L)" /
-"Water Vol (L)" / "Total Vol (L)" columns) — it is not sent over MQTT.
+A water-layer volume is computed separately per reading (`volume_water_l`, looked
+up from the water level + `offset_mm_water` in the same strapping table) and is
+only surfaced in the **web UI** (Status → Fuel Level Sensors: "Water Vol (L)")
+— it is not sent over MQTT. There is no "total volume" anymore.
 
 ### Log lines
 
@@ -137,6 +139,7 @@ Same sensor fields as the Local Topic, but wrapped with `message_id` and
     {
       "slocn": "FS-01",
       "number": "01",
+      "status": 1,
       "capacity_l": 40000,
       "fuel_level_mm": 2500,
       "volume_l": 30000,
@@ -253,9 +256,12 @@ another `{"command":"get_pending"}` request — as many times as needed.
   from each record's own original `timestamp` nested inside `records[]`) and
   publishes it back to **this same Request/Replay Topic** — batches do NOT go
   to the Cloud Data Topic (that's telemetry-only).
-- Waits up to **10s** for that batch's ack, expected back on this same
-  Request/Replay Topic (same success/failed/timeout rules as telemetry above,
-  just on a different topic).
+- The batch's ack (10s window) is expected back on this same Request/Replay
+  Topic (same success/failed/timeout rules as telemetry above, just on a
+  different topic). It is handled asynchronously — the main loop is not
+  blocked while waiting. Only one batch is in flight at a time: a
+  `get_pending` that arrives before the previous batch is acked/timed out is
+  ignored.
   - **Ack succeeds** → those rows are deleted from the table.
   - **Ack fails or times out** → rows are **not deleted**, stay queued exactly
     as they were. Nothing is resent automatically — wait for the next
@@ -277,14 +283,14 @@ another `{"command":"get_pending"}` request — as many times as needed.
       "type": "telemetry",
       "company": "PT. Putra Perkasa Abadi",
       "plant_id": "PPA-BA",
-      "data": [{"slocn":"FS-01","number":"01","capacity_l":40000,"fuel_level_mm":2500,"volume_l":30000,"temperature_c":26,"timestamp":"2026-08-18T04:10:00Z"}]
+      "data": [{"slocn":"FS-01","number":"01","status":1,"capacity_l":40000,"fuel_level_mm":2500,"volume_l":30000,"temperature_c":26,"timestamp":"2026-08-18T04:10:00Z"}]
     },
     {
       "message_id": "atg-1755500144876-43",
       "type": "telemetry",
       "company": "PT. Putra Perkasa Abadi",
       "plant_id": "PPA-BA",
-      "data": [{"slocn":"FS-01","number":"01","capacity_l":40000,"fuel_level_mm":2510,"volume_l":30100,"temperature_c":26,"timestamp":"2026-08-18T04:12:00Z"}]
+      "data": [{"slocn":"FS-01","number":"01","status":1,"capacity_l":40000,"fuel_level_mm":2510,"volume_l":30100,"temperature_c":26,"timestamp":"2026-08-18T04:12:00Z"}]
     }
   ]
 }
@@ -328,7 +334,8 @@ The remaining 13 rows are **not** sent automatically. A second
 ```
 [INFO] [MQTT-CLOUD] Replay batch: sending 50 rows (ids 51..100)
 [WARN] [MQTT-CLOUD] Ack FAILED message_id=atg-...-79 status=failed (replay batch) rtt=890ms
-[WARN] [MQTT-CLOUD] Replay batch: ack FAILED or timed out, 50 rows stay queued (not deleted)
+[WARN] [MQTT-CLOUD] Replay batch: ack FAILED, 50 rows stay queued (not deleted)
+(on silence instead: Replay batch: ack timed out (no reply within 10s), 50 rows stay queued (not deleted))
 ```
 
 Those 50 rows remain untouched — the next `get_pending` request will offer
@@ -395,6 +402,10 @@ restart** — logged when applied:
 ```
 [INFO] [MQTT-CLOUD] cloud publish interval 120 -> 5s (live)
 ```
+
+The cloud topics are re-subscribed automatically on every (re)connect to the
+broker, so a broker restart or network drop no longer loses ack/`get_pending`
+delivery.
 
 Everything else (broker host/port, credentials, topic paths, `enabled` /
 `cloud_enabled`, `cloud_store_on_fail`) is still loaded once at startup and
